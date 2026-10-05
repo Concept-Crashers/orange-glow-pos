@@ -13,7 +13,7 @@ export type Product = { id: number; name: string; category: string; price: numbe
 export type CartItem = { id: number; quantity: number };
 export type Sale = { id: string; date: string; items: { name: string; quantity: number; price: number; cost: number }[]; subtotal: number; discount: number; total: number; payment: string; cashier: string; refunded: boolean };
 export type StockEntry = { product: string; change: number; reason: string; date: string };
-export const categories = ['All products', 'Fruits & vegetables', 'Dairy & eggs', 'Bakery', 'Beverages', 'Pantry'];
+export const categories = ['All products', 'Fruits & vegetables', 'Dairy & eggs', 'Bakery', 'Beverages', 'Pantry'] as const;
 const initialProducts: Product[] = [
   { id: 1, name: 'Fresh bananas', category: categories[1], price: 4500, cost: 2800, stock: 48, min: 10, unit: 'bunch', sku: 'FRU-001', image: bananas, active: true },
   { id: 2, name: 'Red apples', category: categories[1], price: 8000, cost: 5000, stock: 32, min: 10, unit: 'kg', sku: 'FRU-002', image: apples, active: true },
