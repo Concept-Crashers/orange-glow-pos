@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
-import { Sparkles as _unused } from 'lucide-react';
 import { Lightbulb, Send, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { usePos, currency } from '@/lib/pos';
 import { useAuth, roleLabel, type Role } from '@/lib/auth';
 import { askSalesInsights } from '@/lib/insights.functions';
-void _unused;
 
 function Heading({ title, subtitle }: { title: string; subtitle: string }) { return <div className="page-heading"><div><div className="eyebrow">FRESH MARKET WORKSPACE</div><h1>{title}</h1><p>{subtitle}</p></div></div>; }
 
@@ -74,8 +72,9 @@ export function TeamView() {
   async function setRole(id: string, role: Role) {
     setError('');
     const del = await supabase.from('user_roles').delete().eq('user_id', id).neq('role', role);
-    const ins = await supabase.from('user_roles').upsert({ user_id: id, role }, { onConflict: 'user_id,role' });
-    if (del.error || ins.error) setError((del.error ?? ins.error)!.message);
+    const ins = await supabase.from('user_roles').insert({ user_id: id, role });
+    const insErr = ins.error && ins.error.code !== '23505' ? ins.error : null;
+    if (del.error || insErr) setError((del.error ?? insErr)!.message);
     await load(); if (id === session?.user.id) refresh();
   }
   return <main className="management-page"><Heading title="Team & roles" subtitle={isAdmin ? 'Choose what each staff member can do.' : 'See who works in this store.'}/>
