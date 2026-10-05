@@ -4,7 +4,7 @@ import { createLovableAiGatewayRunIdFetch } from './run-id.server';
 
 export class GatewayError extends Error { constructor(public status: number, message: string) { super(message); } }
 
-export async function analyzeSales(question: string, data: unknown) {
+export async function analyzeSales(question: string, data: unknown, system?: string) {
   const apiKey = process.env['LOVABLE_API_KEY'];
   if (!apiKey) throw new GatewayError(401, 'AI is not configured for this store yet.');
   const runIdFetch = createLovableAiGatewayRunIdFetch();
@@ -17,7 +17,7 @@ export async function analyzeSales(question: string, data: unknown) {
   let failure: unknown;
   const result = streamText({
     model: provider.responses('openai/gpt-6-astra'),
-    system: 'You are a retail analyst for a grocery store in Kampala. Prices are in UGX. Answer the manager\'s question using ONLY the POS data provided. Be concise (under 250 words). Use markdown: a one-line answer, then "Key findings" bullets with numbers, then "Recommended actions" as 2-4 concrete steps. If the data is insufficient, say so and suggest what to track.',
+    system: system ?? 'You are a retail analyst for a grocery store in Kampala. Prices are in UGX. Answer the manager\'s question using ONLY the POS data provided. Be concise (under 250 words). Use markdown: a one-line answer, then "Key findings" bullets with numbers, then "Recommended actions" as 2-4 concrete steps. If the data is insufficient, say so and suggest what to track.',
     prompt: `Question: ${question}\n\nPOS data (JSON):\n${JSON.stringify(data)}`,
     maxRetries: 0,
     onError: ({ error }) => { failure = error; },
