@@ -27,7 +27,7 @@ const initialProducts: Product[] = [
 ];
 export const money = (value: number) => new Intl.NumberFormat('en-UG', { maximumFractionDigits: 0 }).format(value);
 export const currency = (value: number) => `UGX ${money(value)}`;
-type PosState = { products: Product[]; cart: CartItem[]; sales: Sale[]; history: StockEntry[]; add: (id: number) => void; quantity: (id: number, delta: number) => void; clear: () => void; checkout: (discount: number, payment: string) => Sale | null; saveProduct: (product: Product) => void; adjust: (id: number, change: number, reason: string) => void; refund: (id: string) => void };
+type PosState = { products: Product[]; cart: CartItem[]; sales: Sale[]; history: StockEntry[]; add: (id: number) => void; quantity: (id: number, delta: number) => void; clear: () => void; checkout: (discount: number, payment: string, cashier?: string) => Sale | null; saveProduct: (product: Product) => void; adjust: (id: number, change: number, reason: string) => void; refund: (id: string) => void };
 const PosContext = createContext<PosState | null>(null);
 export function PosProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState(initialProducts);
@@ -44,11 +44,11 @@ export function PosProvider({ children }: { children: ReactNode }) {
       return existing ? current.map(i => i.id === id ? { ...i, quantity: next } : i) : [...current, { id, quantity: next }];
     });
   }
-  function checkout(discount: number, payment: string) {
+  function checkout(discount: number, payment: string, cashier = 'Cashier') {
     if (!cart.length || cart.some(i => { const p = products.find(p => p.id === i.id); return !p || !p.active || p.stock < i.quantity; })) return null;
     const items = cart.flatMap(i => { const p = products.find(p => p.id === i.id); return p ? [{ name: p.name, quantity: i.quantity, price: p.price, cost: p.cost }] : []; });
     const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const sale: Sale = { id: `SALE-${String(sales.length + 1).padStart(4, '0')}`, date: new Date().toISOString(), items, subtotal, discount, total: subtotal - subtotal * discount / 100, payment, cashier: 'Alex Morgan', refunded: false };
+    const sale: Sale = { id: `SALE-${String(sales.length + 1).padStart(4, '0')}`, date: new Date().toISOString(), items, subtotal, discount, total: subtotal - subtotal * discount / 100, payment, cashier, refunded: false };
     setProducts(current => current.map(p => ({ ...p, stock: p.stock - (cart.find(i => i.id === p.id)?.quantity ?? 0) })));
     setHistory(current => [...items.map(i => ({ product: i.name, change: -i.quantity, reason: sale.id, date: sale.date })), ...current]);
     setSales(current => [sale, ...current]); setCart([]); return sale;

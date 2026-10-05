@@ -3,9 +3,10 @@ import { Search, ScanBarcode, Plus, Minus, Trash2, ShoppingBag, ArrowRight, Bank
 import { Button } from '@/components/ui/button';
 import { usePos, categories, money, currency, type Sale } from '@/lib/pos';
 import { Receipt } from '@/components/receipt';
+import { useAuth } from '@/lib/auth';
 const payments = [{ name: 'Cash', icon: Banknote }, { name: 'Mobile Money', icon: Smartphone }, { name: 'Card', icon: CreditCard }, { name: 'Bank transfer', icon: Landmark }];
 export function PosRegister() {
-  const { products, cart, add, quantity, clear, checkout } = usePos();
+  const { products, cart, add, quantity, clear, checkout } = usePos(); const auth = useAuth();
   const [category, setCategory] = useState('All products');
   const [search, setSearch] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -24,7 +25,7 @@ export function PosRegister() {
   const itemCount = cart.reduce((sum, i) => sum + i.quantity, 0);
   function complete() {
     if (payment === 'Cash' && (!tendered || Number(tendered) < total)) { setError('Enter a cash amount equal to or greater than the total.'); return; }
-    const sale = checkout(discount, payment);
+    const sale = checkout(discount, payment, auth.name);
     if (!sale) { setError('Stock has changed. Please review your order.'); return; }
     setReceipt(sale); setCheckoutOpen(false); setDiscount(0); setCustomer('');
   }
