@@ -3,9 +3,10 @@ import { Search, ScanBarcode, Plus, Minus, Trash2, ShoppingBag, ArrowRight, Bank
 import { Button } from '@/components/ui/button';
 import { usePos, categories, money, currency, type Sale } from '@/lib/pos';
 import { Receipt } from '@/components/receipt';
+import { useAuth } from '@/lib/auth';
 const payments = [{ name: 'Cash', icon: Banknote }, { name: 'Mobile Money', icon: Smartphone }, { name: 'Card', icon: CreditCard }, { name: 'Bank transfer', icon: Landmark }];
 export function PosRegister() {
-  const { products, cart, add, quantity, clear, checkout } = usePos();
+  const { products, cart, add, quantity, clear, checkout } = usePos(); const auth = useAuth();
   const [category, setCategory] = useState('All products');
   const [search, setSearch] = useState('');
   const [discount, setDiscount] = useState(0);
