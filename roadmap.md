@@ -1,6 +1,11 @@
 # POS interface
-- [x] Orange-and-white cashier screen with product photos, search, categories, cart, discounts, payment selection, and sample receipts.
-- [x] Product/inventory, transaction, dashboard, and report views using session-only sample data.
-- [x] Verify checkout and screen layouts: sale, discounted receipt, transaction readback, refund, stock restoration, and phone overflow checked.
+- [x] Orange-and-white cashier screen, products, inventory, transactions, reports.
+- [x] Staff sign-in/sign-up/reset forms with Google; roles admin, manager, cashier with role-based menus.
+- [x] Sales dashboard: daily totals, payment breakdown with shares, top sellers with revenue.
+- [x] Receipt printing sized for 80mm receipt printers.
+- [x] Stock levels visible to cashiers; managers update quantities.
+- [x] AI sales insights for managers.
+- [x] Cashier "My shift" and admin "Team & roles" screens.
+- [ ] Signed-in walkthrough — waits on the first staff account being created.
 
-Full challenge authentication, shared data, and online submission are outside this UI-focused pass.
+Sales and catalog data still reset each session; only accounts and roles are saved.
