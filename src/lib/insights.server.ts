@@ -23,7 +23,8 @@ export async function analyzeSales(question: string, data: unknown) {
     onError: ({ error }) => { failure = error; },
     providerOptions: { openai: { forceReasoning: true, reasoningEffort: 'low', reasoningSummary: 'auto', store: false, include: ['reasoning.encrypted_content'] } },
   });
-  const text = await result.text.catch(e => { failure ??= e; return ''; });
+  let text = '';
+  try { text = await result.text; } catch (e) { failure ??= e; }
   if (failure || !text) {
     const status = (failure as { statusCode?: number })?.statusCode ?? 500;
     const msg = status === 402 ? 'AI credits are used up. Add credits in workspace billing to keep using insights.' : status === 429 ? 'Too many requests right now. Please wait a moment and try again.' : status === 403 ? 'AI access is blocked for this workspace.' : 'The analysis could not be completed. Please try again.';
