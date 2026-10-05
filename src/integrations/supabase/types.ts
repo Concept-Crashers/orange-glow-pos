@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      products: {
+        Row: {
+          active: boolean
+          category: string
+          cost: number
+          id: number
+          image: string
+          min_stock: number
+          name: string
+          price: number
+          sku: string
+          stock: number
+          unit: string
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          cost?: number
+          id: number
+          image?: string
+          min_stock?: number
+          name: string
+          price?: number
+          sku: string
+          stock?: number
+          unit?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          cost?: number
+          id?: number
+          image?: string
+          min_stock?: number
+          name?: string
+          price?: number
+          sku?: string
+          stock?: number
+          unit?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -32,6 +74,90 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+        }
+        Relationships: []
+      }
+      sales: {
+        Row: {
+          cashier: string
+          created_at: string
+          discount: number
+          id: string
+          items: Json
+          payment: string
+          refunded: boolean
+          subtotal: number
+          total: number
+        }
+        Insert: {
+          cashier: string
+          created_at?: string
+          discount?: number
+          id: string
+          items?: Json
+          payment: string
+          refunded?: boolean
+          subtotal?: number
+          total?: number
+        }
+        Update: {
+          cashier?: string
+          created_at?: string
+          discount?: number
+          id?: string
+          items?: Json
+          payment?: string
+          refunded?: boolean
+          subtotal?: number
+          total?: number
+        }
+        Relationships: []
+      }
+      stock_history: {
+        Row: {
+          change: number
+          created_at: string
+          id: string
+          product: string
+          reason: string
+        }
+        Insert: {
+          change: number
+          created_at?: string
+          id?: string
+          product: string
+          reason: string
+        }
+        Update: {
+          change?: number
+          created_at?: string
+          id?: string
+          product?: string
+          reason?: string
+        }
+        Relationships: []
+      }
+      store_settings: {
+        Row: {
+          address: string
+          id: number
+          phone: string
+          shop_name: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          id?: number
+          phone?: string
+          shop_name?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          id?: number
+          phone?: string
+          shop_name?: string
+          updated_at?: string
         }
         Relationships: []
       }
