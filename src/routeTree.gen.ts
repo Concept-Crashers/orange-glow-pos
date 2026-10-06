@@ -11,13 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CashierRouteImport } from './routes/cashier'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as InventoryRouteImport } from './routes/inventory'
+import { Route as ManagerRouteImport } from './routes/manager'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RestockRouteImport } from './routes/restock'
 import { Route as SalesRouteImport } from './routes/sales'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ShiftRouteImport } from './routes/shift'
 import { Route as TeamRouteImport } from './routes/team'
 
@@ -29,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CashierRoute = CashierRouteImport.update({
+  id: '/cashier',
+  path: '/cashier',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -46,6 +55,11 @@ const InventoryRoute = InventoryRouteImport.update({
   path: '/inventory',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ManagerRoute = ManagerRouteImport.update({
+  id: '/manager',
+  path: '/manager',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -61,9 +75,19 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RestockRoute = RestockRouteImport.update({
+  id: '/restock',
+  path: '/restock',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SalesRoute = SalesRouteImport.update({
   id: '/sales',
   path: '/sales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShiftRoute = ShiftRouteImport.update({
@@ -80,26 +104,34 @@ const TeamRoute = TeamRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/cashier': typeof CashierRoute
   '/dashboard': typeof DashboardRoute
   '/insights': typeof InsightsRoute
   '/inventory': typeof InventoryRoute
+  '/manager': typeof ManagerRoute
   '/products': typeof ProductsRoute
   '/reports': typeof ReportsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/restock': typeof RestockRoute
   '/sales': typeof SalesRoute
+  '/settings': typeof SettingsRoute
   '/shift': typeof ShiftRoute
   '/team': typeof TeamRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/cashier': typeof CashierRoute
   '/dashboard': typeof DashboardRoute
   '/insights': typeof InsightsRoute
   '/inventory': typeof InventoryRoute
+  '/manager': typeof ManagerRoute
   '/products': typeof ProductsRoute
   '/reports': typeof ReportsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/restock': typeof RestockRoute
   '/sales': typeof SalesRoute
+  '/settings': typeof SettingsRoute
   '/shift': typeof ShiftRoute
   '/team': typeof TeamRoute
 }
@@ -107,13 +139,17 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/cashier': typeof CashierRoute
   '/dashboard': typeof DashboardRoute
   '/insights': typeof InsightsRoute
   '/inventory': typeof InventoryRoute
+  '/manager': typeof ManagerRoute
   '/products': typeof ProductsRoute
   '/reports': typeof ReportsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/restock': typeof RestockRoute
   '/sales': typeof SalesRoute
+  '/settings': typeof SettingsRoute
   '/shift': typeof ShiftRoute
   '/team': typeof TeamRoute
 }
@@ -122,39 +158,51 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/cashier'
     | '/dashboard'
     | '/insights'
     | '/inventory'
+    | '/manager'
     | '/products'
     | '/reports'
     | '/reset-password'
+    | '/restock'
     | '/sales'
+    | '/settings'
     | '/shift'
     | '/team'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/cashier'
     | '/dashboard'
     | '/insights'
     | '/inventory'
+    | '/manager'
     | '/products'
     | '/reports'
     | '/reset-password'
+    | '/restock'
     | '/sales'
+    | '/settings'
     | '/shift'
     | '/team'
   id:
     | '__root__'
     | '/'
     | '/auth'
+    | '/cashier'
     | '/dashboard'
     | '/insights'
     | '/inventory'
+    | '/manager'
     | '/products'
     | '/reports'
     | '/reset-password'
+    | '/restock'
     | '/sales'
+    | '/settings'
     | '/shift'
     | '/team'
   fileRoutesById: FileRoutesById
@@ -162,13 +210,17 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  CashierRoute: typeof CashierRoute
   DashboardRoute: typeof DashboardRoute
   InsightsRoute: typeof InsightsRoute
   InventoryRoute: typeof InventoryRoute
+  ManagerRoute: typeof ManagerRoute
   ProductsRoute: typeof ProductsRoute
   ReportsRoute: typeof ReportsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RestockRoute: typeof RestockRoute
   SalesRoute: typeof SalesRoute
+  SettingsRoute: typeof SettingsRoute
   ShiftRoute: typeof ShiftRoute
   TeamRoute: typeof TeamRoute
 }
@@ -187,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cashier': {
+      id: '/cashier'
+      path: '/cashier'
+      fullPath: '/cashier'
+      preLoaderRoute: typeof CashierRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -210,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InventoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/manager': {
+      id: '/manager'
+      path: '/manager'
+      fullPath: '/manager'
+      preLoaderRoute: typeof ManagerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products': {
       id: '/products'
       path: '/products'
@@ -231,11 +297,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/restock': {
+      id: '/restock'
+      path: '/restock'
+      fullPath: '/restock'
+      preLoaderRoute: typeof RestockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sales': {
       id: '/sales'
       path: '/sales'
       fullPath: '/sales'
       preLoaderRoute: typeof SalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shift': {
@@ -258,13 +338,17 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  CashierRoute: CashierRoute,
   DashboardRoute: DashboardRoute,
   InsightsRoute: InsightsRoute,
   InventoryRoute: InventoryRoute,
+  ManagerRoute: ManagerRoute,
   ProductsRoute: ProductsRoute,
   ReportsRoute: ReportsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RestockRoute: RestockRoute,
   SalesRoute: SalesRoute,
+  SettingsRoute: SettingsRoute,
   ShiftRoute: ShiftRoute,
   TeamRoute: TeamRoute,
 }

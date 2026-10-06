@@ -10,9 +10,10 @@
 <!-- LOVABLE:END -->
 
 ## Application rules
-- Keep shared POS sample state in a root-mounted provider so navigation retains the session's cart, catalog, and sales; sales and catalog data remain session-only; only accounts and roles persist.
+- Keep shared POS sample state in a root-mounted provider so navigation retains the session's cart, catalog, and sales; products, sales, stock history and store settings persist in Lovable Cloud; the cart stays in memory.
 - Place each business workspace view at its own top-level route with distinct metadata; the root supplies shared navigation.
 - Keep all visual styles and semantic color values in the global design system; business components consume its classes.
 - Staff sign-in and roles (admin, manager, cashier) live in Lovable Cloud with roles in a separate user_roles table; the first account becomes admin, later ones cashier. Why: prevents privilege escalation.
 - The shell gates every page by minimum role from its navigation list; server functions re-check roles. Why: UI gating alone is not security.
-- AI sales insights run in a server function that receives the session's POS data and calls the AI Gateway. Why: keeps the key server-side while sales data is still session-only.
+- AI sales insights and restock advice run in role-checked server functions that receive POS data from the client and call the AI Gateway. Why: keeps the key server-side.
+- TEST MODE (TEST_MODE in the auth module + open RLS policies on store tables) lets anyone use every page with a preview role. Why: owner is testing; must be replaced by role-based policies before launch.

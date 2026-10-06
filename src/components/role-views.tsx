@@ -9,7 +9,7 @@ import { askSalesInsights } from '@/lib/insights.functions';
 
 function Heading({ title, subtitle }: { title: string; subtitle: string }) { return <div className="page-heading"><div><div className="eyebrow">FRESH MARKET WORKSPACE</div><h1>{title}</h1><p>{subtitle}</p></div></div>; }
 
-function renderMarkdown(text: string) {
+export function renderMarkdown(text: string) {
   return text.split('\n').map((line, i) => {
     const bold = (s: string) => s.split(/\*\*(.+?)\*\*/g).map((part, j) => j % 2 ? <strong key={j}>{part}</strong> : part);
     if (/^#{1,4}\s/.test(line)) return <h3 key={i}>{bold(line.replace(/^#+\s/, ''))}</h3>;
@@ -23,7 +23,7 @@ const suggestions = ['Which products should I restock first this week?', 'How ar
 
 export function InsightsView() {
   const { sales, products } = usePos();
-  const ask = useServerFn(askSalesInsights);
+  const ask = useServerFn(askSalesInsights); const { preview } = useAuth();
   const [question, setQuestion] = useState(''); const [answer, setAnswer] = useState(''); const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
   async function submit(q = question) {
     if (q.trim().length < 3 || busy) return;
@@ -33,7 +33,7 @@ export function InsightsView() {
       sales: sales.map(s => ({ date: s.date, total: s.total, discountPercent: s.discount, payment: s.payment, cashier: s.cashier, refunded: s.refunded, items: s.items.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })) })),
     };
     try { const r = await ask({ data: { question: q, data } }); if (r.ok) setAnswer(r.text); else setError(r.error); }
-    catch { setError('The analysis could not be completed. Please try again.'); }
+    catch { setError(preview ? 'Sign in with a manager account to use sales insights.' : 'The analysis could not be completed. Please try again.'); }
     setBusy(false);
   }
   return <main className="management-page"><Heading title="Sales insights" subtitle="Ask a question about your store and get clear, practical advice."/>
