@@ -77,6 +77,32 @@
 .signout-btn { font-size:12px; }
 .receipt-qty { display:block; color:var(--muted-foreground); font-size:9px; }
 @media(max-width:640px) { .insight-box { flex-direction:column; align-items:stretch; } }
+.auth-input { position:relative; display:flex; align-items:center; }
+.auth-input > svg { position:absolute; left:12px; color:var(--muted-foreground); pointer-events:none; }
+.auth-input input { width:100%; padding-left:38px !important; }
+.auth-eye { position:absolute; right:10px; color:var(--muted-foreground); display:grid; place-items:center; }
+.auth-forgot { align-self:flex-end; display:block; margin-left:auto; color:var(--primary); font-size:12px; font-weight:600; }
+.auth-links span { color:var(--muted-foreground); }
+.auth-links button { display:inline-flex; align-items:center; gap:4px; }
+.auth-skip { display:block; text-align:center; margin-top:16px; font-size:12px; color:var(--muted-foreground); text-decoration:underline; }
+.profile-trigger { display:flex; align-items:center; gap:10px; padding:4px 8px; border-radius:8px; text-align:left; }
+.profile-trigger:hover { background:var(--accent); }
+.profile-modal { text-align:center; }
+.avatar-lg { width:64px; height:64px; font-size:22px; margin:0 auto 12px; display:grid; place-items:center; }
+.profile-line { display:flex; align-items:center; justify-content:center; gap:6px; margin:4px 0 !important; color:var(--muted-foreground); }
+.role-switch { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.profile-modal .modal-actions { justify-content:center; }
+.task-list { display:flex; flex-direction:column; gap:8px; }
+.task { display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--primary); }
+.task:hover { border-color:var(--primary); }
+.task div { display:flex; flex-direction:column; gap:2px; color:var(--foreground); }
+.task span { color:var(--muted-foreground); font-size:12px; }
+.task-done { color:var(--success); }
+.task-done strong { text-decoration:line-through; color:var(--muted-foreground); }
+.settings-grid { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:24px; margin-top:20px; align-items:start; }
+.settings-card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:24px; }
+.settings-preview { margin:0; background:var(--card); text-align:center; }
+@media(max-width:800px) { .settings-grid { grid-template-columns:1fr; } }
 @page { size:80mm auto; margin:0; }
 @media print {
   body * { visibility:hidden; }
