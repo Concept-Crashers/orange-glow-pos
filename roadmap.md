@@ -9,3 +9,6 @@
 - [ ] Signed-in walkthrough — waits on the first staff account being created.
 
 Sales and catalog data still reset each session; only accounts and roles are saved.
+
+- [x] Auth form polish, profile/logout window, cashier and manager dashboards with tasks, store settings, saved sales/stock, AI restock advice.
+- [ ] Lock pages and data back down to roles before launch — waits on the owner finishing testing.
