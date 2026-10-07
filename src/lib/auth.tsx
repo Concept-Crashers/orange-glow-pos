@@ -4,8 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 export type Role = 'admin' | 'manager' | 'cashier';
 const rank: Record<Role, number> = { cashier: 1, manager: 2, admin: 3 };
-// TEST MODE: pages are open without signing in; visitors pick a preview role.
-export const TEST_MODE = true;
+// Sign-in required. Set true only to preview screens without an account.
+export const TEST_MODE = false;
 type AuthState = { ready: boolean; session: Session | null; roles: Role[]; role: Role | null; name: string; email: string; preview: boolean; setPreviewRole: (r: Role) => void; can: (minimum: Role) => boolean; signOut: () => Promise<void>; refresh: () => Promise<void> };
 const AuthContext = createContext<AuthState | null>(null);
 

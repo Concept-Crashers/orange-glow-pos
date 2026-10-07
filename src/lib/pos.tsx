@@ -36,7 +36,9 @@ export function PosProvider({ children }: { children: ReactNode }) {
   const fail = (e: { message: string } | null) => { if (e) setError(`Could not save: ${e.message}`); };
 
   useEffect(() => {
-    (async () => {
+    const load = async () => {
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) { setProducts([]); setSales([]); setHistory([]); setLoading(false); return; }
       const [p, s, h, st] = await Promise.all([
         supabase.from('products').select('*').order('id'),
         supabase.from('sales').select('*').order('created_at', { ascending: false }).limit(1000),
@@ -50,7 +52,9 @@ export function PosProvider({ children }: { children: ReactNode }) {
       setHistory((h.data ?? []).map(r => ({ product: r.product, change: r.change, reason: r.reason, date: r.created_at })));
       if (st.data) setSettings(st.data);
       setLoading(false);
-    })();
+    };
+    const { data: sub } = supabase.auth.onAuthStateChange(e => { if (e === 'SIGNED_IN' || e === 'INITIAL_SESSION' || e === 'SIGNED_OUT') setTimeout(load, 0); });
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   const persistProduct = (p: Product) => supabase.from('products').upsert({ id: p.id, name: p.name, category: p.category, price: p.price, cost: p.cost, stock: p.stock, min_stock: p.min, unit: p.unit, sku: p.sku, image: fromImage(p.image), active: p.active }).then(r => fail(r.error));
