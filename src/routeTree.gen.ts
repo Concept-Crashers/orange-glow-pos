@@ -17,6 +17,7 @@ import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as ManagerRouteImport } from './routes/manager'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RestockRouteImport } from './routes/restock'
@@ -65,6 +66,11 @@ const ProductsRoute = ProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/inventory': typeof InventoryRoute
   '/manager': typeof ManagerRoute
   '/products': typeof ProductsRoute
+  '/register': typeof RegisterRoute
   '/reports': typeof ReportsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restock': typeof RestockRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/inventory': typeof InventoryRoute
   '/manager': typeof ManagerRoute
   '/products': typeof ProductsRoute
+  '/register': typeof RegisterRoute
   '/reports': typeof ReportsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restock': typeof RestockRoute
@@ -145,6 +153,7 @@ export interface FileRoutesById {
   '/inventory': typeof InventoryRoute
   '/manager': typeof ManagerRoute
   '/products': typeof ProductsRoute
+  '/register': typeof RegisterRoute
   '/reports': typeof ReportsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/restock': typeof RestockRoute
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/manager'
     | '/products'
+    | '/register'
     | '/reports'
     | '/reset-password'
     | '/restock'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/manager'
     | '/products'
+    | '/register'
     | '/reports'
     | '/reset-password'
     | '/restock'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/manager'
     | '/products'
+    | '/register'
     | '/reports'
     | '/reset-password'
     | '/restock'
@@ -216,6 +228,7 @@ export interface RootRouteChildren {
   InventoryRoute: typeof InventoryRoute
   ManagerRoute: typeof ManagerRoute
   ProductsRoute: typeof ProductsRoute
+  RegisterRoute: typeof RegisterRoute
   ReportsRoute: typeof ReportsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RestockRoute: typeof RestockRoute
@@ -283,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reports': {
       id: '/reports'
       path: '/reports'
@@ -344,6 +364,7 @@ const rootRouteChildren: RootRouteChildren = {
   InventoryRoute: InventoryRoute,
   ManagerRoute: ManagerRoute,
   ProductsRoute: ProductsRoute,
+  RegisterRoute: RegisterRoute,
   ReportsRoute: ReportsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RestockRoute: RestockRoute,

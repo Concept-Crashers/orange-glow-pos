@@ -3,9 +3,9 @@ import { useAuth, roleLabel, type Role } from '@/lib/auth';
 import { LayoutDashboard, ShoppingBasket, Package, Boxes, ReceiptText, ChartNoAxesCombined, Store, ChevronDown, Lightbulb, Clock, Users, LogOut, Settings, PackagePlus, Home, Mail, ShieldCheck, LogIn, HelpCircle, Bell, CircleCheck, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-const navigation: { to: '/cashier' | '/manager' | '/restock' | '/settings' | '/' | '/shift' | '/dashboard' | '/insights' | '/products' | '/inventory' | '/sales' | '/reports' | '/team'; label: string; icon: typeof ShoppingBasket; min: Role }[] = [
+const navigation: { to: '/cashier' | '/manager' | '/restock' | '/settings' | '/register' | '/shift' | '/dashboard' | '/insights' | '/products' | '/inventory' | '/sales' | '/reports' | '/team'; label: string; icon: typeof ShoppingBasket; min: Role }[] = [
   { to: '/cashier', label: 'Cashier dashboard', icon: Home, min: 'cashier' },
-  { to: '/', label: 'Point of sale', icon: ShoppingBasket, min: 'cashier' },
+  { to: '/register', label: 'Point of sale', icon: ShoppingBasket, min: 'cashier' },
   { to: '/shift', label: 'My shift', icon: Clock, min: 'cashier' },
   { to: '/inventory', label: 'Stock levels', icon: Boxes, min: 'cashier' },
   { to: '/manager', label: 'Manager dashboard', icon: Home, min: 'manager' },
@@ -18,7 +18,7 @@ const navigation: { to: '/cashier' | '/manager' | '/restock' | '/settings' | '/'
   { to: '/team', label: 'Team & roles', icon: Users, min: 'admin' },
   { to: '/settings', label: 'Store settings', icon: Settings, min: 'admin' },
 ];
-const publicPaths = ['/auth', '/reset-password'];
+const publicPaths = ['/', '/auth', '/reset-password'];
 export function PosShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: s => s.location.pathname });
   const [open, setOpen] = useState(false);
@@ -33,7 +33,7 @@ export function PosShell({ children }: { children: ReactNode }) {
   const initials = auth.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
   return <div className="app-shell">
     <aside className={`sidebar ${open ? 'sidebar-open' : ''}`}>
-      <Link to="/" className="brand"><span className="brand-symbol"><ShoppingBasket size={23}/></span>till<span className="text-primary">point</span><span className="brand-dot">.</span></Link>
+      <Link to="/register" className="brand"><span className="brand-symbol"><ShoppingBasket size={23}/></span>till<span className="text-primary">point</span><span className="brand-dot">.</span></Link>
       <div className="store-switch"><span className="store-icon"><Store size={19}/></span><div><strong>Fresh Market</strong><span>Main store · Kampala</span></div><ChevronDown size={16}/></div>
       <div className="nav-label">WORKSPACE</div>
       <nav>{allowed.map(n => <Button key={n.to} asChild variant="ghost" className={`nav-item ${path === n.to ? 'nav-active' : ''}`}><Link to={n.to} onClick={() => setOpen(false)}><n.icon size={19}/><span>{n.label}</span>{path === n.to && <span className="nav-marker"/>}</Link></Button>)}</nav>
