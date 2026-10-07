@@ -9,7 +9,7 @@ import { askRestockPlan } from '@/lib/insights.functions';
 import { renderMarkdown } from '@/components/role-views';
 
 function Heading({ title, subtitle, children }: { title: string; subtitle: string; children?: React.ReactNode }) { return <div className="page-heading"><div><div className="eyebrow">FRESH MARKET WORKSPACE</div><h1>{title}</h1><p>{subtitle}</p></div>{children}</div>; }
-type Task = { label: string; done: boolean; to: '/' | '/inventory' | '/sales' | '/restock' | '/insights' | '/dashboard' | '/settings' | '/products' | '/shift'; hint: string };
+type Task = { label: string; done: boolean; to: '/register' | '/inventory' | '/sales' | '/restock' | '/insights' | '/dashboard' | '/settings' | '/products' | '/shift'; hint: string };
 function Tasks({ items }: { items: Task[] }) {
   return <div className="task-list">{items.map(t => <Link key={t.label} to={t.to} className={`task ${t.done ? 'task-done' : ''}`}>{t.done ? <CheckCircle2 size={20}/> : <Circle size={20}/>}<div><strong>{t.label}</strong><span>{t.hint}</span></div></Link>)}</div>;
 }
@@ -21,12 +21,12 @@ export function CashierDashboard() {
   const total = mine.reduce((v, s) => v + s.total, 0);
   const low = products.filter(p => p.active && p.stock <= p.min);
   const tasks: Task[] = [
-    { label: 'Open the till and serve customers', done: mine.length > 0, to: '/', hint: mine.length ? `${mine.length} sales completed today` : 'Start your first sale of the day' },
-    { label: 'Print a receipt for every sale', done: mine.length > 0, to: '/', hint: 'Use “Print receipt” after each checkout' },
+    { label: 'Open the till and serve customers', done: mine.length > 0, to: '/register', hint: mine.length ? `${mine.length} sales completed today` : 'Start your first sale of the day' },
+    { label: 'Print a receipt for every sale', done: mine.length > 0, to: '/register', hint: 'Use “Print receipt” after each checkout' },
     { label: 'Check shelf stock levels', done: false, to: '/inventory', hint: low.length ? `${low.length} items are running low — tell your manager` : 'All items are well stocked' },
     { label: 'Review your shift before closing', done: false, to: '/shift', hint: 'Count cash and compare with your shift total' },
   ];
-  return <main className="management-page"><Heading title={`Good to see you, ${name.split(' ')[0]}`} subtitle="Your cashier dashboard and today’s tasks."><Button asChild><Link to="/"><ShoppingBasket/>New sale</Link></Button></Heading>
+  return <main className="management-page"><Heading title={`Good to see you, ${name.split(' ')[0]}`} subtitle="Your cashier dashboard and today’s tasks."><Button asChild><Link to="/register"><ShoppingBasket/>New sale</Link></Button></Heading>
     <div className="metric-grid"><div className="metric"><span>My sales today</span><strong>{currency(total)}</strong></div><div className="metric"><span>Transactions</span><strong>{mine.length}</strong></div><div className="metric"><span>Cash collected</span><strong>{currency(mine.filter(s => s.payment === 'Cash').reduce((v, s) => v + s.total, 0))}</strong></div><div className="metric"><span>Low-stock items</span><strong>{low.length}</strong></div></div>
     <div className="dashboard-columns"><section><h2 className="section-heading">Today’s tasks</h2><Tasks items={tasks}/></section>
     <section><h2 className="section-heading">Running low</h2>{low.length ? <div className="table-wrap"><table><thead><tr><th>Product</th><th>In stock</th></tr></thead><tbody>{low.map(p => <tr key={p.id}><td>{p.name}</td><td><span className="stock-tag low">{p.stock} left</span></td></tr>)}</tbody></table></div> : <div className="empty-state"><Boxes/><h3>Shelves look good</h3><p>No items are below their minimum.</p></div>}</section></div>
