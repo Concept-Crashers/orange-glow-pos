@@ -1,11 +1,12 @@
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import { useAuth, roleLabel, type Role } from '@/lib/auth';
-import { LayoutDashboard, ShoppingBasket, Package, Boxes, ReceiptText, ChartNoAxesCombined, Store, ChevronDown, Lightbulb, Clock, Users, LogOut, Settings, PackagePlus, Home, Mail, ShieldCheck, LogIn, HelpCircle, Bell, CircleCheck, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { LayoutDashboard, ShoppingBasket, Package, Boxes, ReceiptText, ChartNoAxesCombined, Store, ChevronDown, Lightbulb, Clock, Users, LogOut, Settings, PackagePlus, Home, Mail, ShieldCheck, LogIn, HelpCircle, Bell, CircleCheck, PanelLeftClose, PanelLeftOpen, X, Sparkles } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-const navigation: { to: '/cashier' | '/manager' | '/restock' | '/settings' | '/register' | '/shift' | '/dashboard' | '/insights' | '/products' | '/inventory' | '/sales' | '/reports' | '/team'; label: string; icon: typeof ShoppingBasket; min: Role }[] = [
+const navigation: { to: '/cashier' | '/assist' | '/manager' | '/restock' | '/settings' | '/register' | '/shift' | '/dashboard' | '/insights' | '/products' | '/inventory' | '/sales' | '/reports' | '/team'; label: string; icon: typeof ShoppingBasket; min: Role }[] = [
   { to: '/cashier', label: 'Cashier dashboard', icon: Home, min: 'cashier' },
   { to: '/register', label: 'Point of sale', icon: ShoppingBasket, min: 'cashier' },
+  { to: '/assist', label: 'Product finder', icon: Sparkles, min: 'cashier' },
   { to: '/shift', label: 'My shift', icon: Clock, min: 'cashier' },
   { to: '/inventory', label: 'Stock levels', icon: Boxes, min: 'cashier' },
   { to: '/manager', label: 'Manager dashboard', icon: Home, min: 'manager' },
@@ -24,9 +25,11 @@ export function PosShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [notice, setNotice] = useState(false); const [profile, setProfile] = useState(false); const [leaving, setLeaving] = useState(false); const go = useNavigate();
   const auth = useAuth();
+  const isPublic = publicPaths.includes(path);
+  useEffect(() => { if (!isPublic && auth.ready && !auth.session && !auth.preview) go({ to: '/auth', replace: true }); }, [isPublic, auth.ready, auth.session, auth.preview, go]);
   const title = navigation.find(n => n.to === path)?.label ?? 'Point of sale';
   if (publicPaths.includes(path)) return <>{children}</>;
-  if (!auth.ready) return <div className="gate-screen">Loading your workspace…</div>;
+  if (!auth.ready || (!auth.session && !auth.preview)) return <div className="gate-screen">Loading your workspace…</div>;
   const allowed = navigation.filter(n => auth.can(n.min));
   const page = navigation.find(n => n.to === path);
   const blocked = page && !auth.can(page.min);

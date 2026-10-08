@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { usePos, currency } from '@/lib/pos';
 import { useAuth, roleLabel, type Role } from '@/lib/auth';
-import { askSalesInsights } from '@/lib/insights.functions';
+import { askSalesInsights, askProductMatch } from '@/lib/insights.functions';
 
 function Heading({ title, subtitle }: { title: string; subtitle: string }) { return <div className="page-heading"><div><div className="eyebrow">FRESH MARKET WORKSPACE</div><h1>{title}</h1><p>{subtitle}</p></div></div>; }
 
@@ -81,5 +81,31 @@ export function TeamView() {
     {error && <p role="alert" className="auth-error">{error}</p>}
     <div className="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead><tbody>{members.map(m => { const current: Role = m.roles.includes('admin') ? 'admin' : m.roles.includes('manager') ? 'manager' : 'cashier'; return <tr key={m.id}><td>{m.full_name || '—'}</td><td>{m.email}</td><td>{isAdmin && m.id !== session?.user.id ? <select aria-label={`Role for ${m.email}`} className="role-select" value={current} onChange={e => setRole(m.id, e.target.value as Role)}>{(['cashier', 'manager', 'admin'] as Role[]).map(r => <option key={r} value={r}>{roleLabel[r]}</option>)}</select> : <span className="stock-tag"><ShieldCheck size={12}/> {roleLabel[current]}</span>}</td></tr>; })}</tbody></table></div>
     <p className="sample-label">Cashiers sell and check stock. Managers also see dashboards, update stock, and use insights. Administrators manage the team.</p>
+  </main>;
+}
+
+const needs = ['Breakfast for a family of four', 'A healthy snack for kids', 'Ingredients for a smoothie', 'A gift for a coffee lover'];
+export function ProductFinderView() {
+  const { products, quantity } = usePos();
+  const ask = useServerFn(askProductMatch);
+  const [need, setNeed] = useState(''); const [answer, setAnswer] = useState(''); const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
+  const inStock = products.filter(p => p.active && p.stock > 0);
+  const mentioned = answer ? inStock.filter(p => answer.toLowerCase().includes(p.name.toLowerCase())) : [];
+  async function submit(q = need) {
+    if (q.trim().length < 3 || busy) return;
+    setNeed(q); setBusy(true); setError(''); setAnswer('');
+    const data = { products: inStock.map(p => ({ name: p.name, category: p.category, price: p.price, unit: p.unit, inStock: p.stock })) };
+    try { const r = await ask({ data: { question: q, data } }); if (r.ok) setAnswer(r.text); else setError(r.error); }
+    catch { setError('Recommendations could not be created. Please try again.'); }
+    setBusy(false);
+  }
+  return <main className="management-page"><Heading title="Product finder" subtitle="Describe what the customer needs and get matching in-stock products."/>
+    <div className="insight-box"><textarea aria-label="Customer needs" placeholder="e.g. She's baking a cake this weekend and needs breakfast items too" value={need} onChange={e => setNeed(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } }}/><Button onClick={() => submit()} disabled={busy || need.trim().length < 3}><Send/>{busy ? 'Finding…' : 'Find products'}</Button></div>
+    <div className="report-tabs">{needs.map(s => <Button key={s} variant="outline" size="sm" disabled={busy} onClick={() => submit(s)}>{s}</Button>)}</div>
+    <p className="sample-label">{inStock.length} products currently in stock.</p>
+    {busy && <div className="insight-result insight-wait"><Lightbulb/> Matching against {inStock.length} in-stock products…</div>}
+    {error && <p role="alert" className="auth-error">{error}</p>}
+    {answer && <div className="insight-result"><div className="insight-label"><Lightbulb size={16}/> Recommended for this customer</div>{renderMarkdown(answer)}
+      {mentioned.length > 0 && <div className="report-tabs">{mentioned.map(p => <Button key={p.id} size="sm" onClick={() => quantity(p.id, 1)}>+ Add {p.name} to sale</Button>)}</div>}</div>}
   </main>;
 }

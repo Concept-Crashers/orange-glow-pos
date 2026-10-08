@@ -16,4 +16,5 @@
 - Staff sign-in and roles (admin, manager, cashier) live in Lovable Cloud with roles in a separate user_roles table; the first account becomes admin, later ones cashier. Why: prevents privilege escalation.
 - The shell gates every page by minimum role from its navigation list; server functions re-check roles. Why: UI gating alone is not security.
 - AI sales insights and restock advice run in role-checked server functions that receive POS data from the client and call the AI Gateway. Why: keeps the key server-side.
-- TEST MODE (TEST_MODE in the auth module + open RLS policies on store tables) lets anyone use every page with a preview role. Why: owner is testing; must be replaced by role-based policies before launch.
+- Store tables use role-based RLS (is_staff / is_manager / has_role); a trigger stops cashiers from changing products except reducing stock at checkout; the shell redirects signed-out visitors to /auth and `/` is a public landing page. Why: only authorized staff may change sales, inventory and settings.
+- AI product finder (askProductMatch) is open to any staff role and only sees in-stock products. Why: cashiers need it at the till.
