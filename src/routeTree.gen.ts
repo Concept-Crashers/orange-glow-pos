@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AssistRouteImport } from './routes/assist'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CashierRouteImport } from './routes/cashier'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -29,6 +30,11 @@ import { Route as TeamRouteImport } from './routes/team'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssistRoute = AssistRouteImport.update({
+  id: '/assist',
+  path: '/assist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -109,6 +115,7 @@ const TeamRoute = TeamRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/assist': typeof AssistRoute
   '/auth': typeof AuthRoute
   '/cashier': typeof CashierRoute
   '/dashboard': typeof DashboardRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/assist': typeof AssistRoute
   '/auth': typeof AuthRoute
   '/cashier': typeof CashierRoute
   '/dashboard': typeof DashboardRoute
@@ -146,6 +154,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/assist': typeof AssistRoute
   '/auth': typeof AuthRoute
   '/cashier': typeof CashierRoute
   '/dashboard': typeof DashboardRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/assist'
     | '/auth'
     | '/cashier'
     | '/dashboard'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/assist'
     | '/auth'
     | '/cashier'
     | '/dashboard'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/assist'
     | '/auth'
     | '/cashier'
     | '/dashboard'
@@ -221,6 +233,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AssistRoute: typeof AssistRoute
   AuthRoute: typeof AuthRoute
   CashierRoute: typeof CashierRoute
   DashboardRoute: typeof DashboardRoute
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assist': {
+      id: '/assist'
+      path: '/assist'
+      fullPath: '/assist'
+      preLoaderRoute: typeof AssistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -357,6 +377,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AssistRoute: AssistRoute,
   AuthRoute: AuthRoute,
   CashierRoute: CashierRoute,
   DashboardRoute: DashboardRoute,
