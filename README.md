@@ -2,6 +2,107 @@
 
 Orange Glow POS is a role-based point-of-sale workspace for Fresh Market. It includes checkout, inventory, sales reporting, staff dashboards, restock advice, and store administration.
 
+## Participant
+
+- **Name:** Wambogo Hassan Sadat
+- **Email:** wambogohassan63@gmail.com
+- **Phone:** 0786021431
+
+## Challenge Requirements Coverage
+
+### 1. Authentication and Users
+
+Implemented with Supabase authentication and role-based access:
+
+- **Administrator:** Full system access, team management, and store settings
+- **Manager:** Reports, inventory management, dashboards, sales performance, and AI insights
+- **Cashier:** Product finder, checkout, receipts, inventory visibility, and personal shift reports
+
+### 2. Product Management
+
+Implemented in the Products workspace:
+
+- Add and edit products
+- Deactivate products
+- Assign categories
+- Set buying cost, selling price, stock quantity, and minimum stock level
+- Add product images
+- Track product codes and SKUs
+
+### 3. Inventory Management
+
+Implemented in the Inventory workspace and checkout flow:
+
+- Automatically reduce stock when a sale is completed
+- Add stock and reduce stock through authorized adjustments
+- Maintain stock adjustment history and reasons
+- Show low-stock alerts and out-of-stock products
+- Calculate inventory valuation using stock quantity and buying cost
+
+Supplier management, purchase orders, purchase invoices, and dedicated stock receiving workflows are not currently implemented.
+
+### 4. Sales and POS Interface
+
+The cashier interface supports:
+
+1. Search products
+2. Add products to the cart
+3. Change quantities
+4. Remove cart items
+5. Apply discounts
+6. Calculate subtotal
+7. Calculate the final total
+8. Select a payment method
+9. Complete the sale
+10. Generate and print a receipt
+
+Supported payment methods are Cash, Mobile Money, Card, and Bank transfer.
+
+### 5. Receipts and Checkout Records
+
+Completed sales receive unique receipt records containing the store details, purchased products, quantities, prices, discounts, payment method, totals, cashier, and transaction time. Receipts can be viewed from the sales workspace and printed from checkout.
+
+### 6. Sales Management
+
+Authorized users can:
+
+- View sales and individual receipts
+- Search transactions
+- Filter by date, cashier, and payment method
+- Process permitted refunds
+- Export filtered transaction data to CSV
+
+### 7. Business Dashboard
+
+The dashboards provide:
+
+- Today, weekly, and monthly sales views
+- Transaction counts
+- Total active products
+- Low-stock and out-of-stock indicators
+- Best-selling products
+- Gross profit
+- Sales by payment method
+- Daily sales charts
+
+Dashboards are role-aware and show each user the information appropriate to their role.
+
+### 8. Reports
+
+The Reports workspace includes:
+
+- Sales reports
+- Profit reports
+- Inventory reports
+- Best-selling product reports
+- Low-stock reports
+- Sales by cashier
+- Sales by payment method
+- Date-filtered reporting
+- CSV export
+
+PDF export is not currently implemented.
+
 ## Competition Submission
 
 Complete the placeholders below before submitting the project.
@@ -14,9 +115,9 @@ Complete the placeholders below before submitting the project.
 
 | Role | Email | Password |
 | --- | --- | --- |
-| Administrator | `TODO` | `TODO` |
-| Manager | `TODO` | `TODO` |
-| Cashier | `TODO` | `TODO` |
+| Administrator | `admin@tillpoint.demo` | `Tillpoint#2026` |
+| Manager | `manager@tillpoint.demo` | `Tillpoint#2026` |
+| Cashier | `cashier@tillpoint.demo` | `Tillpoint#2026` |
 
 ### 3. Source Code Repository
 
@@ -63,6 +164,7 @@ Add screenshots of the following workflows before submission:
 - Lucide React icons
 - Vitest and Testing Library
 - Lovable Cloud and AI Gateway integrations
+- GitHub Copilot for AI-assisted development and code review
 
 ### 8. Implemented Features
 

@@ -1,45 +1,486 @@
-import { useState } from 'react';
-import { Search, ScanBarcode, Plus, Minus, Trash2, ShoppingBag, ArrowRight, Banknote, CreditCard, Smartphone, Landmark, SlidersHorizontal, UserRound, X, Check, PackageOpen } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { usePos, categories, money, currency, type Sale } from '@/lib/pos';
-import { Receipt } from '@/components/receipt';
-import { useAuth } from '@/lib/auth';
-const payments = [{ name: 'Cash', icon: Banknote }, { name: 'Mobile Money', icon: Smartphone }, { name: 'Card', icon: CreditCard }, { name: 'Bank transfer', icon: Landmark }];
+import { useState } from "react";
+import {
+  Search,
+  ScanBarcode,
+  Plus,
+  Minus,
+  Trash2,
+  ShoppingBag,
+  ArrowRight,
+  Banknote,
+  CreditCard,
+  Smartphone,
+  Landmark,
+  SlidersHorizontal,
+  UserRound,
+  X,
+  Check,
+  PackageOpen,
+  Loader2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { usePos, categories, money, currency, type Sale } from "@/lib/pos";
+import { Receipt } from "@/components/receipt";
+import { useAuth } from "@/lib/auth";
+const payments = [
+  { name: "Cash", icon: Banknote },
+  { name: "Mobile Money", icon: Smartphone },
+  { name: "Card", icon: CreditCard },
+  { name: "Bank transfer", icon: Landmark },
+];
+const mobileMoneyProviders = ["MTN Mobile Money", "Airtel Money"] as const;
 export function PosRegister() {
-  const { products, cart, add, quantity, clear, checkout } = usePos(); const auth = useAuth();
-  const [category, setCategory] = useState('All products');
-  const [search, setSearch] = useState('');
+  const { products, cart, add, quantity, clear, checkout } = usePos();
+  const auth = useAuth();
+  const [category, setCategory] = useState("All products");
+  const [search, setSearch] = useState("");
   const [discount, setDiscount] = useState(0);
-  const [payment, setPayment] = useState('Cash');
+  const [payment, setPayment] = useState("Cash");
+  const [paymentProvider, setPaymentProvider] = useState<(typeof mobileMoneyProviders)[number]>("MTN Mobile Money");
+  const [paymentPhone, setPaymentPhone] = useState("");
   const [receipt, setReceipt] = useState<Sale | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [tendered, setTendered] = useState('');
-  const [error, setError] = useState('');
+  const [tendered, setTendered] = useState("");
+  const [error, setError] = useState("");
   const [stockOnly, setStockOnly] = useState(false);
-  const [customer, setCustomer] = useState('');
+  const [customer, setCustomer] = useState("");
   const [customerOpen, setCustomerOpen] = useState(false);
-  const shown = products.filter(p => p.active && (category === 'All products' || p.category === category) && `${p.name} ${p.sku}`.toLowerCase().includes(search.toLowerCase()) && (!stockOnly || p.stock > 0));
-  const lines = cart.flatMap(i => { const product = products.find(p => p.id === i.id); return product ? [{ ...i, product }] : []; });
+  const [processing, setProcessing] = useState(false);
+  const shown = products.filter(
+    (p) =>
+      p.active &&
+      (category === "All products" || p.category === category) &&
+      `${p.name} ${p.sku}`.toLowerCase().includes(search.toLowerCase()) &&
+      (!stockOnly || p.stock > 0),
+  );
+  const lines = cart.flatMap((i) => {
+    const product = products.find((p) => p.id === i.id);
+    return product ? [{ ...i, product }] : [];
+  });
   const subtotal = lines.reduce((sum, i) => sum + i.quantity * i.product.price, 0);
   const total = subtotal * (1 - discount / 100);
   const itemCount = cart.reduce((sum, i) => sum + i.quantity, 0);
   function complete() {
-    if (payment === 'Cash' && (!tendered || Number(tendered) < total)) { setError('Enter a cash amount equal to or greater than the total.'); return; }
-    const sale = checkout(discount, payment, auth.name);
-    if (!sale) { setError('Stock has changed. Please review your order.'); return; }
-    setReceipt(sale); setCheckoutOpen(false); setDiscount(0); setCustomer('');
+    if (payment === "Cash" && (!tendered || Number(tendered) < total)) {
+      setError("Enter a cash amount equal to or greater than the total.");
+      return;
+    }
+    const normalizedPhone = paymentPhone.replace(/\s+/g, "");
+    if (payment === "Mobile Money" && !/^(?:\+?256|0)7\d{8}$/.test(normalizedPhone)) {
+      setError("Enter a valid Uganda mobile number, for example 0772 123 456.");
+      return;
+    }
+    const finish = () => {
+      const sale = checkout(
+        discount,
+        payment,
+        auth.name,
+        payment === "Mobile Money" ? paymentProvider : undefined,
+        payment === "Mobile Money" ? normalizedPhone : undefined,
+        customer,
+      );
+      if (!sale) {
+        setProcessing(false);
+        setError("Stock has changed. Please review your order.");
+        return;
+      }
+      setReceipt(sale);
+      setCheckoutOpen(false);
+      setProcessing(false);
+      setDiscount(0);
+      setCustomer("");
+      setPaymentPhone("");
+    };
+    if (payment === "Mobile Money") {
+      setProcessing(true);
+      window.setTimeout(finish, 850);
+    } else finish();
   }
-  return <main className="register-layout"><section className="catalog"><div className="page-heading"><div><div className="eyebrow">SELL SOMETHING GOOD</div><h1>Point of sale</h1><p>A fresh start to your next sale.</p></div><div className="register-badge"><span/>Register 01</div></div><div className="catalog-search"><Search size={20}/><input aria-label="Search products" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products by name or SKU…"/><Button variant="ghost" size="icon" title="Search by barcode or SKU" aria-label="Search by barcode or SKU" onClick={() => document.querySelector<HTMLInputElement>('[aria-label="Search products"]')?.focus()}><ScanBarcode size={21}/></Button><span className="search-divider"/><Button variant={stockOnly ? 'secondary' : 'ghost'} size="icon" title="Show in-stock products" aria-label="Show in-stock products" aria-pressed={stockOnly} onClick={() => setStockOnly(!stockOnly)}><SlidersHorizontal size={18}/></Button></div>
-    <div className="category-tabs">{categories.map((c, i) => <Button key={c} variant={category === c ? 'default' : 'ghost'} className="category-tab" onClick={() => setCategory(c)}>{c === 'All products' && <PackageOpen size={15}/>} {c === 'Fruits & vegetables' ? 'Fresh produce' : c}{i === 0 && <span>{products.filter(p => p.active).length}</span>}</Button>)}</div>
-    <div className="catalog-label"><strong>{category === 'All products' ? 'All products' : category}</strong><span>{shown.length} products available</span></div>
-    <div className="product-grid">{shown.map(p => { const count = cart.find(i => i.id === p.id)?.quantity ?? 0; return <article className={`product-card ${count ? 'product-selected' : ''}`} key={p.id}><div className="product-photo"><img src={p.image} alt={p.name} width={512} height={512} loading="lazy"/>{p.stock <= p.min && <span className="low-stock-tag">{p.stock ? 'Low stock' : 'Out of stock'}</span>}{count > 0 && <span className="product-count"><Check size={12}/> {count}</span>}</div><div className="product-details"><span className="product-category">{p.category}</span><h3>{p.name}</h3><span className="product-unit">{p.unit} <span>·</span> {p.stock} in stock</span><div className="product-bottom"><strong><small>UGX</small> {money(p.price)}</strong><Button variant={count ? 'default' : 'secondary'} size="icon" className="add-product" title={`Add ${p.name}`} aria-label={`Add ${p.name}`} disabled={p.stock <= count} onClick={() => add(p.id)}><Plus size={18}/></Button></div></div></article>; })}</div>{!shown.length && <div className="empty-state"><PackageOpen/><h3>No products found</h3><p>Try a different name or category.</p></div>}
-    <div className="catalog-bottom"><span><span className="online-dot"/> Ready for your next sale</span><span>{products.filter(p => p.active).length} products in your catalog</span></div></section>
-    <aside className="order-panel"><div className="order-heading"><div><ShoppingBag size={20}/><h2>Current order</h2><span className="order-count">{itemCount}</span></div><Button variant="ghost" size="icon" aria-label="Clear order" title="Clear order" disabled={!cart.length} onClick={clear}><Trash2 size={17}/></Button></div><div className="order-number"><span>Order #{String(usePos().sales.length + 1).padStart(4, '0')}</span><span>In-store sale</span></div><Button variant="outline" className="customer-button" onClick={() => setCustomerOpen(true)}><UserRound size={18}/><span>{customer || 'Walk-in customer'}</span><Plus size={16}/></Button>
-    <div className="cart-list">{!lines.length ? <div className="empty-cart"><span><ShoppingBag size={31}/></span><h3>Your order starts here</h3><p>Add a little freshness to the cart.</p></div> : lines.map(i => <div className="cart-item" key={i.id}><img src={i.product.image} width={56} height={56} alt={i.product.name}/><div className="cart-item-body"><div className="cart-item-title"><strong>{i.product.name}</strong><Button variant="ghost" size="icon" aria-label={`Remove ${i.product.name}`} title="Remove item" onClick={() => quantity(i.id, -i.quantity)}><X size={13}/></Button></div><span>{currency(i.product.price)}</span><div className="cart-item-bottom"><div className="quantity-control"><Button variant="ghost" size="icon" aria-label={`Decrease ${i.product.name}`} onClick={() => quantity(i.id, -1)}><Minus size={12}/></Button><span>{i.quantity}</span><Button variant="ghost" size="icon" aria-label={`Increase ${i.product.name}`} disabled={i.quantity >= i.product.stock} onClick={() => quantity(i.id, 1)}><Plus size={12}/></Button></div><strong>{money(i.product.price * i.quantity)}</strong></div></div></div>)}</div>
-    <div className="order-summary"><div className="summary-row"><span>Subtotal</span><strong>{currency(subtotal)}</strong></div><div className="summary-row"><label htmlFor="discount">Discount <span className="discount-input"><input id="discount" type="number" min="0" max="100" value={discount} onChange={e => setDiscount(Math.max(0, Math.min(100, Number(e.target.value))))}/>%</span></label><span className="text-success">− {currency(subtotal * discount / 100)}</span></div><div className="summary-total"><div><strong>Total amount</strong><span>{itemCount} {itemCount === 1 ? 'item' : 'items'}</span></div><strong><small>UGX</small> {money(total)}</strong></div><div className="payment-label">PAYMENT METHOD</div><div className="payment-options">{payments.map(p => <Button key={p.name} variant="outline" className={`payment-option ${payment === p.name ? 'payment-active' : ''}`} aria-pressed={payment === p.name} onClick={() => setPayment(p.name)}><p.icon size={18}/><span>{p.name}</span></Button>)}</div><Button className="checkout-button" disabled={!cart.length} onClick={() => { setTendered(String(total)); setError(''); setCheckoutOpen(true); }}>Charge {currency(total)} <ArrowRight size={18}/></Button><div className="checkout-note"><CircleSafe/> Payments recorded in this workspace</div></div></aside>
-    {customerOpen && <div className="modal-backdrop"><form className="simple-modal" onSubmit={e => { e.preventDefault(); setCustomerOpen(false); }}><h2>Customer</h2><label>Customer name<input autoFocus value={customer} onChange={e => setCustomer(e.target.value)} placeholder="Walk-in customer"/></label><div className="modal-actions"><Button type="button" variant="outline" onClick={() => setCustomerOpen(false)}>Cancel</Button><Button type="submit">Save customer</Button></div></form></div>}
-    {checkoutOpen && <div className="modal-backdrop"><div className="simple-modal"><Button variant="ghost" size="icon" className="modal-close" aria-label="Close payment" onClick={() => setCheckoutOpen(false)}><X/></Button><h2>Complete payment</h2><p>{payment} · {itemCount} items</p><div className="payment-due">{currency(total)}</div>{payment === 'Cash' ? <><label>Cash received (UGX)<input autoFocus type="number" min={total} value={tendered} onChange={e => setTendered(e.target.value)}/></label><div className="summary-row"><span>Change</span><strong>{currency(Math.max(0, Number(tendered) - total))}</strong></div></> : <p>Confirm you have received the payment. This does not charge a card or transfer money.</p>}{error && <p role="alert" className="text-destructive">{error}</p>}<Button className="w-full" onClick={complete}><Check/>Confirm payment</Button></div></div>}
-    {receipt && <Receipt sale={receipt} onClose={() => setReceipt(null)}/>}
-  </main>;
+  return (
+    <main className="register-layout">
+      <section className="catalog">
+        <div className="page-heading">
+          <div>
+            <div className="eyebrow">SELL SOMETHING GOOD</div>
+            <h1>Point of sale</h1>
+            <p>A fresh start to your next sale.</p>
+          </div>
+          <div className="register-badge">
+            <span />
+            Register 01
+          </div>
+        </div>
+        <div className="catalog-search">
+          <Search size={20} />
+          <input
+            aria-label="Search products"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search products by name or SKU…"
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            title="Search by barcode or SKU"
+            aria-label="Search by barcode or SKU"
+            onClick={() =>
+              document.querySelector<HTMLInputElement>('[aria-label="Search products"]')?.focus()
+            }
+          >
+            <ScanBarcode size={21} />
+          </Button>
+          <span className="search-divider" />
+          <Button
+            variant={stockOnly ? "secondary" : "ghost"}
+            size="icon"
+            title="Show in-stock products"
+            aria-label="Show in-stock products"
+            aria-pressed={stockOnly}
+            onClick={() => setStockOnly(!stockOnly)}
+          >
+            <SlidersHorizontal size={18} />
+          </Button>
+        </div>
+        <div className="category-tabs">
+          {categories.map((c, i) => (
+            <Button
+              key={c}
+              variant={category === c ? "default" : "ghost"}
+              className="category-tab"
+              onClick={() => setCategory(c)}
+            >
+              {c === "All products" && <PackageOpen size={15} />}{" "}
+              {c === "Fruits & vegetables" ? "Fresh produce" : c}
+              {i === 0 && <span>{products.filter((p) => p.active).length}</span>}
+            </Button>
+          ))}
+        </div>
+        <div className="catalog-label">
+          <strong>{category === "All products" ? "All products" : category}</strong>
+          <span>{shown.length} products available</span>
+        </div>
+        <div className="product-grid">
+          {shown.map((p) => {
+            const count = cart.find((i) => i.id === p.id)?.quantity ?? 0;
+            return (
+              <article className={`product-card ${count ? "product-selected" : ""}`} key={p.id}>
+                <div className="product-photo">
+                  <img src={p.image} alt={p.name} width={512} height={512} loading="lazy" />
+                  {p.stock <= p.min && (
+                    <span className="low-stock-tag">{p.stock ? "Low stock" : "Out of stock"}</span>
+                  )}
+                  {count > 0 && (
+                    <span className="product-count">
+                      <Check size={12} /> {count}
+                    </span>
+                  )}
+                </div>
+                <div className="product-details">
+                  <span className="product-category">{p.category}</span>
+                  <h3>{p.name}</h3>
+                  <span className="product-unit">
+                    {p.unit} <span>·</span> {p.stock} in stock
+                  </span>
+                  <div className="product-bottom">
+                    <strong>
+                      <small>UGX</small> {money(p.price)}
+                    </strong>
+                    <Button
+                      variant={count ? "default" : "secondary"}
+                      size="icon"
+                      className="add-product"
+                      title={`Add ${p.name}`}
+                      aria-label={`Add ${p.name}`}
+                      disabled={p.stock <= count}
+                      onClick={() => add(p.id)}
+                    >
+                      <Plus size={18} />
+                    </Button>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+        {!shown.length && (
+          <div className="empty-state">
+            <PackageOpen />
+            <h3>No products found</h3>
+            <p>Try a different name or category.</p>
+          </div>
+        )}
+        <div className="catalog-bottom">
+          <span>
+            <span className="online-dot" /> Ready for your next sale
+          </span>
+          <span>{products.filter((p) => p.active).length} products in your catalog</span>
+        </div>
+      </section>
+      <aside className="order-panel">
+        <div className="order-heading">
+          <div>
+            <ShoppingBag size={20} />
+            <h2>Current order</h2>
+            <span className="order-count">{itemCount}</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Clear order"
+            title="Clear order"
+            disabled={!cart.length}
+            onClick={clear}
+          >
+            <Trash2 size={17} />
+          </Button>
+        </div>
+        <div className="order-number">
+          <span>Order #{String(usePos().sales.length + 1).padStart(4, "0")}</span>
+          <span>In-store sale</span>
+        </div>
+        <Button variant="outline" className="customer-button" onClick={() => setCustomerOpen(true)}>
+          <UserRound size={18} />
+          <span>{customer || "Walk-in customer"}</span>
+          <Plus size={16} />
+        </Button>
+        <div className="cart-list">
+          {!lines.length ? (
+            <div className="empty-cart">
+              <span>
+                <ShoppingBag size={31} />
+              </span>
+              <h3>Your order starts here</h3>
+              <p>Add a little freshness to the cart.</p>
+            </div>
+          ) : (
+            lines.map((i) => (
+              <div className="cart-item" key={i.id}>
+                <img src={i.product.image} width={56} height={56} alt={i.product.name} />
+                <div className="cart-item-body">
+                  <div className="cart-item-title">
+                    <strong>{i.product.name}</strong>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Remove ${i.product.name}`}
+                      title="Remove item"
+                      onClick={() => quantity(i.id, -i.quantity)}
+                    >
+                      <X size={13} />
+                    </Button>
+                  </div>
+                  <span>{currency(i.product.price)}</span>
+                  <div className="cart-item-bottom">
+                    <div className="quantity-control">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={`Decrease ${i.product.name}`}
+                        onClick={() => quantity(i.id, -1)}
+                      >
+                        <Minus size={12} />
+                      </Button>
+                      <span>{i.quantity}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={`Increase ${i.product.name}`}
+                        disabled={i.quantity >= i.product.stock}
+                        onClick={() => quantity(i.id, 1)}
+                      >
+                        <Plus size={12} />
+                      </Button>
+                    </div>
+                    <strong>{money(i.product.price * i.quantity)}</strong>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+        <div className="order-summary">
+          <div className="summary-row">
+            <span>Subtotal</span>
+            <strong>{currency(subtotal)}</strong>
+          </div>
+          <div className="summary-row">
+            <label htmlFor="discount">
+              Discount{" "}
+              <span className="discount-input">
+                <input
+                  id="discount"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={discount}
+                  onChange={(e) => setDiscount(Math.max(0, Math.min(100, Number(e.target.value))))}
+                />
+                %
+              </span>
+            </label>
+            <span className="text-success">− {currency((subtotal * discount) / 100)}</span>
+          </div>
+          <div className="summary-total">
+            <div>
+              <strong>Total amount</strong>
+              <span>
+                {itemCount} {itemCount === 1 ? "item" : "items"}
+              </span>
+            </div>
+            <strong>
+              <small>UGX</small> {money(total)}
+            </strong>
+          </div>
+          <div className="payment-label">PAYMENT METHOD</div>
+          <div className="payment-options">
+            {payments.map((p) => (
+              <Button
+                key={p.name}
+                variant="outline"
+                className={`payment-option ${payment === p.name ? "payment-active" : ""}`}
+                aria-pressed={payment === p.name}
+                onClick={() => {
+                  setPayment(p.name);
+                  setError("");
+                }}
+              >
+                <p.icon size={18} />
+                <span>{p.name}</span>
+              </Button>
+            ))}
+          </div>
+          <Button
+            className="checkout-button"
+            disabled={!cart.length}
+            onClick={() => {
+              setTendered(String(total));
+              setError("");
+              setCheckoutOpen(true);
+            }}
+          >
+            Charge {currency(total)} <ArrowRight size={18} />
+          </Button>
+          <div className="checkout-note">
+            <CircleSafe /> Payments recorded in this workspace
+          </div>
+        </div>
+      </aside>
+      {customerOpen && (
+        <div className="modal-backdrop">
+          <form
+            className="simple-modal"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setCustomerOpen(false);
+            }}
+          >
+            <h2>Customer</h2>
+            <label>
+              Customer name
+              <input
+                autoFocus
+                value={customer}
+                onChange={(e) => setCustomer(e.target.value)}
+                placeholder="Walk-in customer"
+              />
+            </label>
+            <div className="modal-actions">
+              <Button type="button" variant="outline" onClick={() => setCustomerOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Save customer</Button>
+            </div>
+          </form>
+        </div>
+      )}
+      {checkoutOpen && (
+        <div className="modal-backdrop">
+          <div className="simple-modal">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="modal-close"
+              aria-label="Close payment"
+              onClick={() => !processing && setCheckoutOpen(false)}
+            >
+              <X />
+            </Button>
+            <h2>Complete payment</h2>
+            <p>
+              {payment} · {itemCount} items
+            </p>
+            <div className="payment-due">{currency(total)}</div>
+            {payment === "Cash" ? (
+              <>
+                <label>
+                  Cash received (UGX)
+                  <input
+                    autoFocus
+                    type="number"
+                    min={total}
+                    value={tendered}
+                    onChange={(e) => setTendered(e.target.value)}
+                  />
+                </label>
+                <div className="summary-row">
+                  <span>Change</span>
+                  <strong>{currency(Math.max(0, Number(tendered) - total))}</strong>
+                </div>
+              </>
+            ) : payment === "Mobile Money" ? (
+              <div className="payment-mobile-money">
+                <span className="payment-section-label">Mobile Money network</span>
+                <div className="provider-options" role="group" aria-label="Mobile Money network">
+                  {mobileMoneyProviders.map((provider) => (
+                    <button
+                      type="button"
+                      className={`provider-option ${paymentProvider === provider ? "provider-active" : ""}`}
+                      key={provider}
+                      aria-pressed={paymentProvider === provider}
+                      onClick={() => setPaymentProvider(provider)}
+                    >
+                      <span className={`provider-mark ${provider.startsWith("MTN") ? "provider-mtn" : "provider-airtel"}`}>
+                        {provider.startsWith("MTN") ? "MTN" : "A"}
+                      </span>
+                      <span>{provider}</span>
+                    </button>
+                  ))}
+                </div>
+                <label>
+                  Customer phone number
+                  <input
+                    autoFocus
+                    type="tel"
+                    inputMode="tel"
+                    placeholder="0772 123 456"
+                    value={paymentPhone}
+                    onChange={(e) => setPaymentPhone(e.target.value)}
+                  />
+                </label>
+                <div className="payment-processing-note"><Smartphone size={15} /> A payment prompt will be sent to this number.</div>
+              </div>
+            ) : (
+              <p>
+                Confirm you have received the payment. This does not charge a card or transfer
+                money.
+              </p>
+            )}
+            {error && (
+              <p role="alert" className="text-destructive">
+                {error}
+              </p>
+            )}
+            <Button className={`w-full ${processing ? "payment-confirming" : ""}`} onClick={complete} disabled={processing}>
+              {processing ? <Loader2 className="animate-spin" /> : <Check />}
+              {processing ? "Confirming payment…" : "Confirm payment"}
+            </Button>
+          </div>
+        </div>
+      )}
+      {receipt && <Receipt sale={receipt} onClose={() => setReceipt(null)} />}
+    </main>
+  );
 }
-function CircleSafe() { return <span className="safe-mark">✓</span>; }
+function CircleSafe() {
+  return <span className="safe-mark">✓</span>;
+}

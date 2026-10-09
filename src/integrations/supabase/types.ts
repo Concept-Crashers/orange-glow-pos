@@ -85,6 +85,9 @@ export type Database = {
           id: string
           items: Json
           payment: string
+          payment_phone: string | null
+          payment_provider: string | null
+          customer: string | null
           refunded: boolean
           subtotal: number
           total: number
@@ -96,6 +99,9 @@ export type Database = {
           id: string
           items?: Json
           payment: string
+          payment_phone?: string | null
+          payment_provider?: string | null
+          customer?: string | null
           refunded?: boolean
           subtotal?: number
           total?: number
@@ -107,6 +113,9 @@ export type Database = {
           id?: string
           items?: Json
           payment?: string
+          payment_phone?: string | null
+          payment_provider?: string | null
+          customer?: string | null
           refunded?: boolean
           subtotal?: number
           total?: number

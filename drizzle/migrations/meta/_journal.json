@@ -22,6 +22,13 @@
       "when": 1791357178631,
       "tag": "0002_role_based_store_access",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791550000000,
+      "tag": "0003_sale_payment_details",
+      "breakpoints": true
     }
   ]
 }
