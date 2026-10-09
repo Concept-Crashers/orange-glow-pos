@@ -6,9 +6,10 @@
 - [x] Stock levels visible to cashiers; managers update quantities.
 - [x] AI sales insights for managers.
 - [x] Cashier "My shift" and admin "Team & roles" screens.
-- [ ] Signed-in walkthrough — waits on the first staff account being created.
-
-Sales and catalog data still reset each session; only accounts and roles are saved.
-
-- [x] Auth form polish, profile/logout window, cashier and manager dashboards with tasks, store settings, saved sales/stock, AI restock advice.
-- [ ] Lock pages and data back down to roles before launch — waits on the owner finishing testing.
+- [x] Signed-in walkthrough — admin, manager and cashier accounts created and each verified end to end.
+- [x] Sales, catalog, stock history and store settings saved to the backend; kept after a reload.
+- [x] Pages and data locked down to roles: sign-in required, role checks in the shell and in the database.
+- [x] Product finder for cashiers (AI), role-based access control, professional multi-section homepage.
+- [x] Demo login credentials hidden from the sign-in page.
+- [ ] Replace placeholder homepage details (plan prices, address, phone, email, checkout speed figure) with the owner's real ones — waits on the owner supplying them.
+- [ ] Receipt header address and phone are still placeholders — waits on the owner entering real details in Store settings.
