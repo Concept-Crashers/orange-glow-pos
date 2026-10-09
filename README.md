@@ -106,8 +106,6 @@ PDF export is not currently implemented.
 
 ## Competition Submission
 
-Complete the placeholders below before submitting the project.
-
 ### 1. Live System URL
 https://pos-khaki-seven.vercel.app/
 
