@@ -214,8 +214,8 @@ Configure Supabase credentials and server-side secrets in the deployment environ
 
 ### 10. Optional Demonstration Video
 
-`TODO: Add a short demonstration video URL showing sign-in, checkout, inventory, dashboards, reporting, and AI advice.`
+`TODO: soon Adding a short demonstration video URL showing sign-in, checkout, inventory, dashboards, reporting, and AI advice.`
 
-## Lovable Development
+## Foundation built by Lovable Development and assisted by Github Copilot
 
-This project was built with [Lovable](https://lovable.dev). Continue development in the [Lovable editor](https://lovable.dev/projects/0243843a-e010-4fcd-a61c-56f56ca5f428).
+This project was partially built with [Lovable](https://lovable.dev).
