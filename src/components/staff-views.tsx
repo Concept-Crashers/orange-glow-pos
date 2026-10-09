@@ -86,7 +86,7 @@ export function SettingsView() {
   const [form, setForm] = useState(settings); const [busy, setBusy] = useState(false); const [msg, setMsg] = useState(''); const [err, setErr] = useState('');
   const [synced, setSynced] = useState(settings);
   if (synced !== settings) { setSynced(settings); setForm(settings); }
-  async function save(e: React.FormEvent) { e.preventDefault(); setBusy(true); setMsg(''); setErr(''); const r = await saveSettings({ shop_name: form.shop_name.trim(), address: form.address.trim(), phone: form.phone.trim() }); if (r) setErr(r); else setMsg('Store details saved. New receipts will use them.'); setBusy(false); }
+  async function save(e: React.FormEvent) { e.preventDefault(); setBusy(true); setMsg(''); setErr(''); const r = await saveSettings({ shop_name: form.shop_name.trim(), address: form.address.trim(), phone: form.phone.trim(), primary_color: form.primary_color }); if (r) setErr(r); else setMsg('Store details saved. New receipts will use them.'); setBusy(false); }
   return <main className="management-page"><Heading title="Store settings" subtitle="These details appear at the top of every printed receipt."/>
     <div className="settings-grid"><form className="settings-card auth-form" onSubmit={save}>
       <label>Shop name<input required maxLength={60} placeholder="e.g. Fresh Market" value={form.shop_name} onChange={e => setForm({ ...form, shop_name: e.target.value })} disabled={!can('admin')}/></label>
