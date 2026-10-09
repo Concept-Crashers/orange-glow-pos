@@ -127,3 +127,30 @@
 .landing-contact { border:1px solid var(--border); border-radius:14px; padding:26px; display:grid; gap:14px; }.landing-contact p { display:flex; gap:10px; align-items:center; }.landing-contact svg { color:var(--primary); }
 .landing-footer { display:flex; justify-content:space-between; padding:24px 6vw; border-top:1px solid var(--border); font-size:13px; color:var(--muted-foreground); }
 @media (max-width:900px) { .landing-nav nav { display:none; } .landing-hero,.landing-split { grid-template-columns:1fr; } .landing-grid,.landing-steps { grid-template-columns:1fr; } .landing-section { padding:60px 6vw; } }
+/* Professional KPI cards */
+.metric-grid { gap:16px; border:0; padding:0; }
+.metric, .metric:first-child, .metric:last-child { position:relative; padding:20px 22px; background:var(--card); border:1px solid var(--border); border-radius:5px; box-shadow:0 1px 2px color-mix(in oklab, var(--foreground) 6%, transparent); overflow:hidden; transition:transform .2s, box-shadow .2s, border-color .2s; animation:rise-in .45s ease both; }
+.metric::before { content:""; position:absolute; inset:0 auto 0 0; width:3px; background:var(--primary); }
+.metric:hover { transform:translateY(-2px); border-color:color-mix(in oklab, var(--primary) 40%, var(--border)); box-shadow:0 10px 24px -14px color-mix(in oklab, var(--primary) 45%, transparent); }
+.metric>span { text-transform:uppercase; letter-spacing:.06em; font-weight:600; font-size:10px; }
+.metric strong { font-size:26px; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.metric small { display:inline-block; padding:3px 7px; border-radius:3px; background:var(--success-soft); }
+.metric:nth-child(2){animation-delay:.06s}.metric:nth-child(3){animation-delay:.12s}.metric:nth-child(4){animation-delay:.18s}
+@media(max-width:640px){ .metric-grid{gap:12px}.metric:nth-child(odd),.metric:nth-child(2){padding:16px;border:1px solid var(--border)} }
+/* Welcome banner */
+.welcome-banner { margin:24px 32px 0; padding:24px 28px; border-radius:5px; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; background:linear-gradient(120deg, var(--primary), color-mix(in oklab, var(--primary) 70%, var(--foreground))); color:var(--primary-foreground); animation:rise-in .5s ease both; }
+.welcome-banner span { font-size:11px; opacity:.85; text-transform:uppercase; letter-spacing:.08em; }
+.welcome-banner h2 { font-size:22px; font-weight:650; margin:6px 0 4px; }
+.welcome-banner p { font-size:13px; opacity:.9; }
+.welcome-banner a { background:var(--card); color:var(--primary); border-radius:5px; }
+.welcome-banner + .management-page { padding-top:24px; }
+@media(max-width:640px){ .welcome-banner{margin:16px 16px 0;padding:20px} }
+/* Page + hero animations */
+.page-transition { animation:page-in .35s ease both; }
+@keyframes page-in { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+@keyframes rise-in { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+@keyframes float-y { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
+.landing-hero-copy > * { animation:rise-in .7s ease both; }
+.landing-hero-copy > :nth-child(2){animation-delay:.1s}.landing-hero-copy > :nth-child(3){animation-delay:.2s}.landing-hero-copy > :nth-child(4){animation-delay:.3s}.landing-hero-copy > :nth-child(5){animation-delay:.4s}
+.landing-hero-img { animation:rise-in .9s .2s ease both, float-y 6s 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .page-transition,.metric,.welcome-banner,.landing-hero-copy > *,.landing-hero-img { animation:none !important; } }
