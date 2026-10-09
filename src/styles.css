@@ -128,15 +128,17 @@
 .landing-footer { display:flex; justify-content:space-between; padding:24px 6vw; border-top:1px solid var(--border); font-size:13px; color:var(--muted-foreground); }
 @media (max-width:900px) { .landing-nav nav { display:none; } .landing-hero,.landing-split { grid-template-columns:1fr; } .landing-grid,.landing-steps { grid-template-columns:1fr; } .landing-section { padding:60px 6vw; } }
 /* Professional KPI cards */
-.metric-grid { gap:16px; border:0; padding:0; }
-.metric, .metric:first-child, .metric:last-child { position:relative; padding:20px 22px; background:var(--card); border:1px solid var(--border); border-radius:5px; box-shadow:0 1px 2px color-mix(in oklab, var(--foreground) 6%, transparent); overflow:hidden; transition:transform .2s, box-shadow .2s, border-color .2s; animation:rise-in .45s ease both; }
-.metric::before { content:""; position:absolute; inset:0 auto 0 0; width:3px; background:var(--primary); }
-.metric:hover { transform:translateY(-2px); border-color:color-mix(in oklab, var(--primary) 40%, var(--border)); box-shadow:0 10px 24px -14px color-mix(in oklab, var(--primary) 45%, transparent); }
-.metric>span { text-transform:uppercase; letter-spacing:.06em; font-weight:600; font-size:10px; }
-.metric strong { font-size:26px; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
-.metric small { display:inline-block; padding:3px 7px; border-radius:3px; background:var(--success-soft); }
+.metric-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; border:0; padding:0; }
+.metric, .metric:first-child, .metric:last-child { display:flex; align-items:flex-start; gap:14px; padding:18px 20px; background:transparent; border:1px solid color-mix(in oklab, var(--primary) 45%, var(--border)); border-radius:8px; box-shadow:none; transition:transform .2s, box-shadow .2s, border-color .2s, background-color .2s; animation:rise-in .45s ease both; }
+.metric:hover { transform:translateY(-2px); border-color:var(--primary); background:color-mix(in oklab, var(--primary) 6%, transparent); box-shadow:0 12px 26px -16px color-mix(in oklab, var(--primary) 55%, transparent); }
+.metric-icon { flex:none; display:inline-grid; place-items:center; width:42px; height:42px; border-radius:8px; border:1px solid color-mix(in oklab, var(--primary) 45%, var(--border)); background:transparent; color:var(--primary); }
+.metric-body { min-width:0; }
+.metric-body>span { display:block; color:var(--muted-foreground); font-size:10px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; }
+.metric strong { display:block; font-size:24px; margin-top:6px; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.metric small { display:inline-block; margin-top:8px; padding:3px 7px; border-radius:4px; background:var(--success-soft); color:var(--success); font-size:10px; }
 .metric:nth-child(2){animation-delay:.06s}.metric:nth-child(3){animation-delay:.12s}.metric:nth-child(4){animation-delay:.18s}
-@media(max-width:640px){ .metric-grid{gap:12px}.metric:nth-child(odd),.metric:nth-child(2){padding:16px;border:1px solid var(--border)} }
+@media(max-width:900px){ .metric{padding:16px}.metric strong{font-size:20px} }
+@media(max-width:640px){ .metric-grid{grid-template-columns:1fr 1fr;gap:12px}.metric,.metric:nth-child(odd),.metric:nth-child(2){padding:14px;border:1px solid color-mix(in oklab, var(--primary) 45%, var(--border))} }
 /* Welcome banner */
 .welcome-banner { margin:24px 32px 0; padding:24px 28px; border-radius:5px; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; background:linear-gradient(120deg, var(--primary), color-mix(in oklab, var(--primary) 70%, var(--foreground))); color:var(--primary-foreground); animation:rise-in .5s ease both; }
 .welcome-banner span { font-size:11px; opacity:.85; text-transform:uppercase; letter-spacing:.08em; }
