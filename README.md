@@ -120,8 +120,7 @@ Complete the placeholders below before submitting the project.
 | Cashier | `cashier@tillpoint.demo` | `Tillpoint#2026` |
 
 ### 3. Source Code Repository
-
-`TODO: Add the public source repository URL.`
+https://github.com/Concept-Crashers/orange-glow-pos
 
 ### 4. Database Structure and Schema
 
