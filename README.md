@@ -1,4 +1,5 @@
 # Tillpoint
+<img src="pos1.png" alt="pos_review" width="" height="">
 
 Tillpoint is a role-based point-of-sale workspace for Fresh Market. It includes checkout, inventory, sales reporting, staff dashboards, restock advice, and store administration.
 
@@ -109,7 +110,7 @@ Complete the placeholders below before submitting the project.
 
 ### 1. Live System URL
 
-`TODO: Add the deployed application URL.`
+`TODO: soon adding the deployed application URL.`
 
 ### 2. Test Login Credentials
 
@@ -147,7 +148,18 @@ The application is a TanStack Start and React POS application. Shared POS state 
 - Cashier and manager dashboards
 - Restock advice and sales insights
 
-<img src="pos1.png" alt="pos_review" width="" height="">
+<table>
+  <tr>
+    <td><img src="pos1.png" alt="pos_review" width="500" height="500"></td>
+    <td><img src="pos7.png" alt="pos_review" width="500" height="500"></td>
+  </tr>
+  <tr>
+    <td><img src="pos6.png" alt="pos_review" width="500" height="500"></td>
+    <td><img src="pos9.png" alt="pos_review" width="500" height="500"></td>
+  </tr>
+</table>
+
+
 
 ### 7. Technologies Used
 
