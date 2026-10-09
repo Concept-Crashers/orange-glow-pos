@@ -140,8 +140,6 @@ The application is a TanStack Start and React POS application. Shared POS state 
 
 ### 6. Screenshots
 
-Add screenshots of the following workflows before submission:
-
 - Sign-in and role selection
 - Point of sale checkout
 - Business overview dashboard
@@ -149,7 +147,7 @@ Add screenshots of the following workflows before submission:
 - Cashier and manager dashboards
 - Restock advice and sales insights
 
-`TODO: Add screenshots to a submission-assets/screenshots directory and link them here.`
+<img src="pos1.png" alt="pos_review" width="" height="">
 
 ### 7. Technologies Used
 
