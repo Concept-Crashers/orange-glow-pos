@@ -61,7 +61,7 @@ export function LandingPage() {
       <div className="landing-faq">{faqs.map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div></section>
 
     <section id="contact" className="landing-section"><div className="landing-split"><div><span className="eyebrow">CONTACT</span><h2>Talk to our team</h2><p>We help stores set up registers, receipt printers and staff accounts.</p></div>
-      <div className="landing-contact"><p><MapPin size={17}/> Plot 12, Kampala Road, Kampala</p><p><Phone size={17}/> +256 700 000 000</p><p><Mail size={17}/> hello@tillpoint.ug</p><Button asChild><Link to="/auth"><LogIn/>Staff sign in</Link></Button></div></div></section>
+      <div className="landing-contact"><p><MapPin size={17}/> Plot 12, Kampala Road, Kampala</p><p><Phone size={17}/> +256 786 021431</p><p><Mail size={17}/> hello@tillpoint.ug</p><Button asChild><Link to="/auth"><LogIn/>Staff sign in</Link></Button></div></div></section>
 
     <footer className="landing-footer"><span>© 2026 Tillpoint. All rights reserved.</span><span>Made for retailers in Uganda</span></footer>
   </div>;
