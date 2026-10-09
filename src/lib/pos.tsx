@@ -39,7 +39,12 @@ export type Sale = {
   refunded: boolean;
 };
 export type StockEntry = { product: string; change: number; reason: string; date: string };
-export type StoreSettings = { shop_name: string; address: string; phone: string };
+export type StoreSettings = {
+  shop_name: string;
+  address: string;
+  phone: string;
+  primary_color: string;
+};
 export const categories = [
   "All products",
   "Fruits & vegetables",
@@ -68,6 +73,14 @@ const fromImage = (url: string) => {
 export const money = (value: number) =>
   new Intl.NumberFormat("en-UG", { maximumFractionDigits: 0 }).format(value);
 export const currency = (value: number) => `UGX ${money(value)}`;
+const readableForeground = (hex: string) => {
+  const value = hex.replace("#", "");
+  if (value.length !== 6) return "#FFFFFF";
+  const red = Number.parseInt(value.slice(0, 2), 16);
+  const green = Number.parseInt(value.slice(2, 4), 16);
+  const blue = Number.parseInt(value.slice(4, 6), 16);
+  return (red * 299 + green * 587 + blue * 114) / 1000 > 160 ? "#2A211B" : "#FFFFFF";
+};
 
 type PosState = {
   loading: boolean;
@@ -104,6 +117,7 @@ export function PosProvider({ children }: { children: ReactNode }) {
     shop_name: "Fresh Market",
     address: "",
     phone: "",
+    primary_color: "#E97817",
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -131,7 +145,7 @@ export function PosProvider({ children }: { children: ReactNode }) {
           .limit(500),
         supabase
           .from("store_settings")
-          .select("shop_name, address, phone")
+          .select("shop_name, address, phone, primary_color")
           .eq("id", 1)
           .maybeSingle(),
       ]);
@@ -176,7 +190,7 @@ export function PosProvider({ children }: { children: ReactNode }) {
           date: r.created_at,
         })),
       );
-      if (st.data) setSettings(st.data);
+      if (st.data) setSettings({ ...st.data, primary_color: st.data.primary_color || "#E97817" });
       setLoading(false);
     };
     const { data: sub } = supabase.auth.onAuthStateChange((e) => {
@@ -184,7 +198,13 @@ export function PosProvider({ children }: { children: ReactNode }) {
     });
     return () => sub.subscription.unsubscribe();
   }, []);
-
+  useEffect(() => {
+    document.documentElement.style.setProperty("--primary", settings.primary_color);
+    document.documentElement.style.setProperty(
+      "--primary-foreground",
+      readableForeground(settings.primary_color),
+    );
+  }, [settings.primary_color]);
   const persistProduct = (p: Product) =>
     supabase
       .from("products")

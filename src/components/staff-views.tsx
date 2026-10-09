@@ -92,6 +92,8 @@ export function SettingsView() {
       <label>Shop name<input required maxLength={60} placeholder="e.g. Fresh Market" value={form.shop_name} onChange={e => setForm({ ...form, shop_name: e.target.value })} disabled={!can('admin')}/></label>
       <label>Address<input maxLength={120} placeholder="e.g. Plot 12 Kampala Road, Kampala" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} disabled={!can('admin')}/></label>
       <label>Phone number<input maxLength={30} type="tel" placeholder="e.g. +256 700 123 456" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} disabled={!can('admin')}/></label>
+      <label>Primary brand color<span className="color-setting"><input type="color" aria-label="Primary brand color" value={form.primary_color} onChange={e => { const primary_color = e.target.value; setForm({ ...form, primary_color }); document.documentElement.style.setProperty('--primary', primary_color); }} disabled={!can('admin')}/><strong>{form.primary_color}</strong></span></label>
+      <p className="settings-help">This color updates buttons, links, highlights, KPI cards, and the workspace accents.</p>
       {err && <p role="alert" className="auth-error">{err}</p>}{msg && <p className="auth-message">{msg}</p>}
       <Button type="submit" disabled={busy || !can('admin')}>{busy && <Loader2 className="animate-spin"/>}Save details</Button>
     </form>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
-import { Lightbulb, Send, ShieldCheck, ShoppingBasket, ReceiptText, ChartNoAxesCombined, CircleDollarSign } from 'lucide-react';
+import { Lightbulb, Send, ShieldCheck, ShoppingBasket, ReceiptText, ChartNoAxesCombined, CircleDollarSign, Pencil, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Metric } from '@/components/metric';
 import { supabase } from '@/integrations/supabase/client';
@@ -64,6 +64,7 @@ type Member = { id: string; full_name: string; email: string; roles: Role[] };
 export function TeamView() {
   const { can, session, refresh } = useAuth(); const isAdmin = can('admin');
   const [members, setMembers] = useState<Member[]>([]); const [error, setError] = useState('');
+  const [editing, setEditing] = useState<string | null>(null); const [draftName, setDraftName] = useState(''); const [draftRole, setDraftRole] = useState<Role>('cashier'); const [saving, setSaving] = useState(false);
   async function load() {
     const [{ data: p, error: e }, { data: r }] = await Promise.all([supabase.from('profiles').select('id, full_name, email').order('created_at'), supabase.from('user_roles').select('user_id, role')]);
     if (e) { setError(e.message); return; }
@@ -78,9 +79,18 @@ export function TeamView() {
     if (del.error || insErr) setError((del.error ?? insErr)!.message);
     await load(); if (id === session?.user.id) refresh();
   }
+  function beginEdit(member: Member) { setEditing(member.id); setDraftName(member.full_name); setDraftRole(member.roles.includes('admin') ? 'admin' : member.roles.includes('manager') ? 'manager' : 'cashier'); setError(''); }
+  async function saveMember(member: Member) {
+    setSaving(true); setError('');
+    const profile = await supabase.from('profiles').update({ full_name: draftName.trim() }).eq('id', member.id);
+    if (profile.error) setError(profile.error.message);
+    else { await setRole(member.id, draftRole); setEditing(null); }
+    setSaving(false);
+  }
   return <main className="management-page"><Heading title="Team & roles" subtitle={isAdmin ? 'Choose what each staff member can do.' : 'See who works in this store.'}/>
     {error && <p role="alert" className="auth-error">{error}</p>}
-    <div className="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead><tbody>{members.map(m => { const current: Role = m.roles.includes('admin') ? 'admin' : m.roles.includes('manager') ? 'manager' : 'cashier'; return <tr key={m.id}><td>{m.full_name || '—'}</td><td>{m.email}</td><td>{isAdmin && m.id !== session?.user.id ? <select aria-label={`Role for ${m.email}`} className="role-select" value={current} onChange={e => setRole(m.id, e.target.value as Role)}>{(['cashier', 'manager', 'admin'] as Role[]).map(r => <option key={r} value={r}>{roleLabel[r]}</option>)}</select> : <span className="stock-tag"><ShieldCheck size={12}/> {roleLabel[current]}</span>}</td></tr>; })}</tbody></table></div>
+    <div className="team-toolbar"><div><strong>{members.length} staff member{members.length === 1 ? '' : 's'}</strong><span>Manage names and workspace access.</span></div>{isAdmin && <span className="team-admin-badge"><ShieldCheck size={14}/> Administrator controls</span>}</div>
+    <div className="team-list">{members.map(m => { const current: Role = m.roles.includes('admin') ? 'admin' : m.roles.includes('manager') ? 'manager' : 'cashier'; const isEditing = editing === m.id; return <article className="team-member" key={m.id}><div className="team-avatar">{(m.full_name || m.email).slice(0, 1).toUpperCase()}</div><div className="team-member-main">{isEditing ? <input className="team-name-input" aria-label={`Name for ${m.email}`} value={draftName} onChange={e => setDraftName(e.target.value)} /> : <strong>{m.full_name || 'Unnamed staff member'}</strong>}<span>{m.email}</span></div><div className="team-member-role">{isEditing ? <select aria-label={`Role for ${m.email}`} className="role-select" value={draftRole} onChange={e => setDraftRole(e.target.value as Role)}>{(['cashier', 'manager', 'admin'] as Role[]).map(r => <option key={r} value={r}>{roleLabel[r]}</option>)}</select> : <span className={`team-role role-${current}`}><ShieldCheck size={13}/> {roleLabel[current]}</span>}</div>{isAdmin && m.id !== session?.user.id && <div className="team-member-actions">{isEditing ? <><Button size="icon" title="Save staff member" aria-label="Save staff member" disabled={saving} onClick={() => saveMember(m)}><Save size={16}/></Button><Button size="icon" variant="ghost" title="Cancel editing" aria-label="Cancel editing" onClick={() => setEditing(null)}><X size={16}/></Button></> : <Button size="icon" variant="outline" title={`Edit ${m.email}`} aria-label={`Edit ${m.email}`} onClick={() => beginEdit(m)}><Pencil size={16}/></Button>}</div>}</article>; })}</div>
     <p className="sample-label">Cashiers sell and check stock. Managers also see dashboards, update stock, and use insights. Administrators manage the team.</p>
   </main>;
 }

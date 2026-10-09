@@ -29,6 +29,13 @@
       "when": 1791550000000,
       "tag": "0003_sale_payment_details",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791551000000,
+      "tag": "0004_settings_and_profile_editing",
+      "breakpoints": true
     }
   ]
 }
