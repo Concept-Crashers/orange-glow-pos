@@ -1,6 +1,6 @@
-# Orange Glow POS
+# Tillpoint
 
-Orange Glow POS is a role-based point-of-sale workspace for Fresh Market. It includes checkout, inventory, sales reporting, staff dashboards, restock advice, and store administration.
+Tillpoint is a role-based point-of-sale workspace for Fresh Market. It includes checkout, inventory, sales reporting, staff dashboards, restock advice, and store administration.
 
 ## Participant
 

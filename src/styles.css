@@ -150,16 +150,16 @@
 @media (max-width:900px) { .landing-nav nav { display:none; } .landing-hero,.landing-split { grid-template-columns:1fr; } .landing-grid,.landing-steps { grid-template-columns:1fr; } .landing-section { padding:60px 6vw; } }
 /* Professional KPI cards */
 .metric-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; border:0; padding:0; }
-.metric, .metric:first-child, .metric:last-child { display:flex; align-items:flex-start; gap:14px; min-height:96px; padding:18px 20px; background:var(--card); border:1px solid color-mix(in oklab, var(--primary) 62%, var(--border)); border-radius:8px; box-shadow:0 5px 16px color-mix(in oklab, var(--foreground) 8%, transparent); transition:transform .2s, box-shadow .2s, border-color .2s, background-color .2s; animation:rise-in .45s ease both; }
-.metric:hover { transform:translateY(-2px); border-color:var(--primary); background:color-mix(in oklab, var(--card) 94%, var(--secondary)); box-shadow:0 12px 26px -16px color-mix(in oklab, var(--primary) 55%, transparent); }
-.metric-icon { flex:none; display:inline-grid; place-items:center; width:42px; height:42px; border-radius:8px; border:1px solid color-mix(in oklab, var(--primary) 55%, var(--border)); background:var(--secondary); color:var(--primary); }
+.metric, .metric:first-child, .metric:last-child { display:flex; align-items:flex-start; gap:14px; min-height:96px; padding:18px 20px; background:var(--primary); color:var(--primary-foreground); border:1px solid var(--primary); border-radius:8px; box-shadow:0 5px 16px color-mix(in oklab, var(--primary) 24%, transparent); transition:transform .2s, box-shadow .2s, border-color .2s, background-color .2s; animation:rise-in .45s ease both; }
+.metric:hover { transform:translateY(-2px); border-color:color-mix(in oklab, var(--primary) 82%, var(--foreground)); background:color-mix(in oklab, var(--primary) 88%, var(--foreground)); box-shadow:0 12px 26px -16px color-mix(in oklab, var(--primary) 70%, transparent); }
+.metric-icon { flex:none; display:inline-grid; place-items:center; width:42px; height:42px; border-radius:8px; border:1px solid color-mix(in oklab, var(--primary-foreground) 58%, transparent); background:color-mix(in oklab, var(--primary-foreground) 16%, transparent); color:var(--primary-foreground); }
 .metric-body { min-width:0; }
-.metric-body>span { display:block; color:var(--muted-foreground); font-size:11px; font-weight:650; letter-spacing:.04em; text-transform:uppercase; }
+.metric-body>span { display:block; color:color-mix(in oklab, var(--primary-foreground) 86%, transparent); font-size:11px; font-weight:650; letter-spacing:.04em; text-transform:uppercase; }
 .metric strong { display:block; font-size:24px; line-height:1.1; margin-top:8px; letter-spacing:0; font-variant-numeric:tabular-nums; }
-.metric small { display:inline-block; margin-top:8px; padding:3px 7px; border-radius:4px; background:var(--success-soft); color:var(--success); font-size:10px; }
+.metric small { display:inline-block; margin-top:8px; padding:3px 7px; border-radius:4px; background:color-mix(in oklab, var(--primary-foreground) 18%, transparent); color:var(--primary-foreground); font-size:10px; }
 .metric:nth-child(2){animation-delay:.06s}.metric:nth-child(3){animation-delay:.12s}.metric:nth-child(4){animation-delay:.18s}
 @media(max-width:900px){ .metric{padding:16px}.metric strong{font-size:20px} }
-@media(max-width:640px){ .metric-grid{grid-template-columns:1fr;gap:12px}.metric,.metric:nth-child(odd),.metric:nth-child(2){min-height:86px;padding:14px;border:1px solid color-mix(in oklab, var(--primary) 62%, var(--border))}.metric strong{font-size:22px} }
+@media(max-width:640px){ .metric-grid{grid-template-columns:1fr;gap:12px}.metric,.metric:nth-child(odd),.metric:nth-child(2){min-height:86px;padding:14px;border:1px solid var(--primary)}.metric strong{font-size:22px} }
 /* Welcome banner */
 .welcome-banner { margin:24px 32px 0; padding:24px 28px; border-radius:8px; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; background:linear-gradient(120deg, var(--primary), color-mix(in oklab, var(--primary) 70%, var(--foreground))); color:var(--primary-foreground); animation:rise-in .5s ease both; }
 .welcome-banner span { font-size:11px; opacity:.85; text-transform:uppercase; letter-spacing:.08em; }
