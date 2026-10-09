@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
-import { ShoppingBasket, Boxes, AlertTriangle, RotateCcw, Lightbulb, PackagePlus, ReceiptText, CheckCircle2, Circle, Store, Loader2, Send, ClipboardList } from 'lucide-react';
+import { ShoppingBasket, Boxes, AlertTriangle, RotateCcw, Lightbulb, PackagePlus, ReceiptText, CheckCircle2, Circle, Store, Loader2, Send, ClipboardList, CircleDollarSign, PackageX, ChartNoAxesCombined } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Metric } from '@/components/metric';
 import { usePos, currency } from '@/lib/pos';
 import { useAuth } from '@/lib/auth';
 import { askRestockPlan } from '@/lib/insights.functions';
@@ -27,7 +28,7 @@ export function CashierDashboard() {
     { label: 'Review your shift before closing', done: false, to: '/shift', hint: 'Count cash and compare with your shift total' },
   ];
   return <main className="management-page"><Heading title={`Good to see you, ${name.split(' ')[0]}`} subtitle="Your cashier dashboard and today’s tasks."><Button asChild><Link to="/register"><ShoppingBasket/>New sale</Link></Button></Heading>
-    <div className="metric-grid"><div className="metric"><span>My sales today</span><strong>{currency(total)}</strong></div><div className="metric"><span>Transactions</span><strong>{mine.length}</strong></div><div className="metric"><span>Cash collected</span><strong>{currency(mine.filter(s => s.payment === 'Cash').reduce((v, s) => v + s.total, 0))}</strong></div><div className="metric"><span>Low-stock items</span><strong>{low.length}</strong></div></div>
+    <div className="metric-grid"><Metric icon={ShoppingBasket} label="My sales today" value={currency(total)}/><Metric icon={ReceiptText} label="Transactions" value={String(mine.length)}/><Metric icon={CircleDollarSign} label="Cash collected" value={currency(mine.filter(s => s.payment === 'Cash').reduce((v, s) => v + s.total, 0))}/><Metric icon={AlertTriangle} label="Low-stock items" value={String(low.length)}/></div>
     <div className="dashboard-columns"><section><h2 className="section-heading">Today’s tasks</h2><Tasks items={tasks}/></section>
     <section><h2 className="section-heading">Running low</h2>{low.length ? <div className="table-wrap"><table><thead><tr><th>Product</th><th>In stock</th></tr></thead><tbody>{low.map(p => <tr key={p.id}><td>{p.name}</td><td><span className="stock-tag low">{p.stock} left</span></td></tr>)}</tbody></table></div> : <div className="empty-state"><Boxes/><h3>Shelves look good</h3><p>No items are below their minimum.</p></div>}</section></div>
   </main>;
@@ -48,7 +49,7 @@ export function ManagerDashboard() {
     { label: 'Ask a sales question', done: false, to: '/insights', hint: 'Get practical advice from your sales' },
   ];
   return <main className="management-page"><Heading title="Manager dashboard" subtitle="Today at a glance and what needs your attention."><Button asChild variant="outline"><Link to="/restock"><PackagePlus/>Restock advice</Link></Button></Heading>
-    <div className="metric-grid"><div className="metric"><span>Sales today</span><strong>{currency(total)}</strong></div><div className="metric"><span>Transactions</span><strong>{done.length}</strong></div><div className="metric"><span>Refunds</span><strong>{refunds.length}</strong></div><div className="metric"><span>Out of stock</span><strong>{out.length}</strong><small>{low.length} low</small></div></div>
+    <div className="metric-grid"><Metric icon={ShoppingBasket} label="Sales today" value={currency(total)}/><Metric icon={ReceiptText} label="Transactions" value={String(done.length)}/><Metric icon={RotateCcw} label="Refunds" value={String(refunds.length)}/><Metric icon={PackageX} label="Out of stock" value={String(out.length)} note={`${low.length} low`}/></div>
     <div className="dashboard-columns"><section><h2 className="section-heading">Your tasks</h2><Tasks items={tasks}/></section>
     <section><h2 className="section-heading">Cashiers today</h2>{cashiers.length ? <div className="table-wrap"><table><thead><tr><th>Cashier</th><th>Sales</th><th>Amount</th></tr></thead><tbody>{cashiers.map(x => <tr key={x.c}><td>{x.c}</td><td>{x.n}</td><td>{currency(x.v)}</td></tr>)}</tbody></table></div> : <div className="empty-state"><ReceiptText/><h3>No sales yet today</h3><p>Cashier activity will appear here.</p></div>}
     <h2 className="section-heading">Needs attention</h2><div className="table-wrap"><table><tbody>{low.map(p => <tr key={p.id}><td><AlertTriangle size={14} className="text-warning"/> {p.name}</td><td>{p.stock} / min {p.min}</td></tr>)}{refunds.map(s => <tr key={s.id}><td><RotateCcw size={14}/> Refund {s.id}</td><td>{currency(s.total)}</td></tr>)}</tbody></table>{!low.length && !refunds.length && <div className="empty-state"><h3>All clear</h3></div>}</div></section></div>
@@ -71,7 +72,7 @@ export function RestockView() {
   }
   const low = products.filter(p => p.active && p.stock <= p.min);
   return <main className="management-page"><Heading title="Restock advice" subtitle="Ask about stock and recent sales to get a prioritised restock list."/>
-    <div className="metric-grid"><div className="metric"><span>Below minimum</span><strong>{low.length}</strong></div><div className="metric"><span>Out of stock</span><strong>{products.filter(p => p.active && !p.stock).length}</strong></div><div className="metric"><span>Sales (14 days)</span><strong>{sales.filter(s => !s.refunded && new Date(s.date).getTime() >= since).length}</strong></div><div className="metric"><span>Stock value</span><strong>{currency(products.reduce((v, p) => v + p.stock * p.cost, 0))}</strong></div></div>
+    <div className="metric-grid"><Metric icon={AlertTriangle} label="Below minimum" value={String(low.length)}/><Metric icon={PackageX} label="Out of stock" value={String(products.filter(p => p.active && !p.stock).length)}/><Metric icon={ChartNoAxesCombined} label="Sales (14 days)" value={String(sales.filter(s => !s.refunded && new Date(s.date).getTime() >= since).length)}/><Metric icon={CircleDollarSign} label="Stock value" value={currency(products.reduce((v, p) => v + p.stock * p.cost, 0))}/></div>
     <div className="insight-box"><textarea aria-label="Your restock question" placeholder="e.g. What should I reorder before the weekend?" value={question} onChange={e => setQuestion(e.target.value)}/><Button onClick={submit} disabled={busy || question.trim().length < 3}>{busy ? <Loader2 className="animate-spin"/> : <Send/>}{busy ? 'Planning…' : 'Get plan'}</Button></div>
     {preview && <p className="sample-label">Restock advice needs a signed-in manager or administrator account.</p>}
     {busy && <div className="insight-result insight-wait"><ClipboardList/> Checking {products.length} products against recent sales…</div>}

@@ -140,7 +140,7 @@
 @media(max-width:900px){ .metric{padding:16px}.metric strong{font-size:20px} }
 @media(max-width:640px){ .metric-grid{grid-template-columns:1fr 1fr;gap:12px}.metric,.metric:nth-child(odd),.metric:nth-child(2){padding:14px;border:1px solid color-mix(in oklab, var(--primary) 45%, var(--border))} }
 /* Welcome banner */
-.welcome-banner { margin:24px 32px 0; padding:24px 28px; border-radius:5px; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; background:linear-gradient(120deg, var(--primary), color-mix(in oklab, var(--primary) 70%, var(--foreground))); color:var(--primary-foreground); animation:rise-in .5s ease both; }
+.welcome-banner { margin:24px 32px 0; padding:24px 28px; border-radius:8px; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; background:linear-gradient(120deg, var(--primary), color-mix(in oklab, var(--primary) 70%, var(--foreground))); color:var(--primary-foreground); animation:rise-in .5s ease both; }
 .welcome-banner span { font-size:11px; opacity:.85; text-transform:uppercase; letter-spacing:.08em; }
 .welcome-banner h2 { font-size:22px; font-weight:650; margin:6px 0 4px; }
 .welcome-banner p { font-size:13px; opacity:.9; }
