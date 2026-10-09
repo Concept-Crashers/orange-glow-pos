@@ -144,7 +144,10 @@
 @media print {
   body * { visibility:hidden; }
   #printable-receipt, #printable-receipt * { visibility:visible; }
-  #printable-receipt { position:absolute; left:0; top:0; width:72mm; margin:0 4mm; padding:4mm 0; border:0; font-family:'Courier New',monospace; font-size:11px; color:#000; background:#fff; }
+  .modal-backdrop { position:static; display:block; padding:0; background:#fff; }
+  .receipt-modal { position:static; width:72mm; max-width:none; max-height:none; overflow:visible; padding:0; border:0; box-shadow:none; }
+  .receipt-modal > :not(#printable-receipt) { display:none; }
+  #printable-receipt { position:static; display:block; width:72mm; min-height:0; height:auto; max-height:none; overflow:visible; box-sizing:border-box; margin:0; padding:4mm; border:0; font-family:'Courier New',monospace; font-size:11px; color:#000; background:#fff; }
   #printable-receipt h3 { font-size:16px; }
   #printable-receipt p, .receipt-qty { color:#000 !important; }
   #printable-receipt .receipt-meta, #printable-receipt .receipt-totals { border-color:#000; }
