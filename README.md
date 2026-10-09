@@ -109,8 +109,7 @@ PDF export is not currently implemented.
 Complete the placeholders below before submitting the project.
 
 ### 1. Live System URL
-
-`TODO: soon adding the deployed application URL.`
+https://pos-khaki-seven.vercel.app/
 
 ### 2. Test Login Credentials
 
