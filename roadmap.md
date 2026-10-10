@@ -11,5 +11,8 @@
 - [x] Pages and data locked down to roles: sign-in required, role checks in the shell and in the database.
 - [x] Product finder for cashiers (AI), role-based access control, professional multi-section homepage.
 - [x] Demo login credentials hidden from the sign-in page.
+- [x] Purchasing: suppliers, purchase orders, invoices, stock receiving.
+- [ ] Render deployment AI — waits on owner setting server settings on Render.
+- [ ] Real product catalog — waits on owner sending it.
 - [ ] Replace placeholder homepage details (plan prices, address, phone, email, checkout speed figure) with the owner's real ones — waits on the owner supplying them.
 - [ ] Receipt header address and phone are still placeholders — waits on the owner entering real details in Store settings.

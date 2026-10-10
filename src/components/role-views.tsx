@@ -107,7 +107,7 @@ export function ProductFinderView() {
     setNeed(q); setBusy(true); setError(''); setAnswer('');
     const data = { products: inStock.map(p => ({ name: p.name, category: p.category, price: p.price, unit: p.unit, inStock: p.stock })) };
     try { const r = await ask({ data: { question: q, data } }); if (r.ok) setAnswer(r.text); else setError(r.error); }
-    catch { setError('Recommendations could not be created. Please try again.'); }
+    catch (e) { setError(`Recommendations could not be created: ${e instanceof Error ? e.message : 'server unreachable'}.`); }
     setBusy(false);
   }
   return <main className="management-page"><Heading title="Product finder" subtitle="Describe what the customer needs and get matching in-stock products."/>

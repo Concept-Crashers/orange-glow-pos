@@ -1,9 +1,9 @@
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import { useAuth, roleLabel, type Role } from '@/lib/auth';
-import { LayoutDashboard, ShoppingBasket, Package, Boxes, ReceiptText, ChartNoAxesCombined, Store, ChevronDown, Lightbulb, Clock, Users, LogOut, Settings, PackagePlus, Home, Mail, ShieldCheck, LogIn, HelpCircle, Bell, CircleCheck, PanelLeftClose, PanelLeftOpen, X, Sparkles } from 'lucide-react';
+import { LayoutDashboard, ShoppingBasket, Package, Boxes, ReceiptText, ChartNoAxesCombined, Store, ChevronDown, Lightbulb, Clock, Users, LogOut, Settings, PackagePlus, Home, Mail, ShieldCheck, LogIn, HelpCircle, Bell, CircleCheck, PanelLeftClose, PanelLeftOpen, X, Sparkles, Truck } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-const navigation: { to: '/cashier' | '/assist' | '/manager' | '/restock' | '/settings' | '/register' | '/shift' | '/dashboard' | '/insights' | '/products' | '/inventory' | '/sales' | '/reports' | '/team'; label: string; icon: typeof ShoppingBasket; min: Role }[] = [
+const navigation: { to: '/cashier' | '/assist' | '/manager' | '/restock' | '/settings' | '/register' | '/shift' | '/dashboard' | '/insights' | '/products' | '/inventory' | '/sales' | '/reports' | '/team' | '/purchasing'; label: string; icon: typeof ShoppingBasket; min: Role }[] = [
   { to: '/cashier', label: 'Cashier dashboard', icon: Home, min: 'cashier' },
   { to: '/register', label: 'Point of sale', icon: ShoppingBasket, min: 'cashier' },
   { to: '/assist', label: 'Product finder', icon: Sparkles, min: 'cashier' },
@@ -14,6 +14,7 @@ const navigation: { to: '/cashier' | '/assist' | '/manager' | '/restock' | '/set
   { to: '/insights', label: 'Sales insights', icon: Lightbulb, min: 'manager' },
   { to: '/restock', label: 'Restock advice', icon: PackagePlus, min: 'manager' },
   { to: '/products', label: 'Products', icon: Package, min: 'manager' },
+  { to: '/purchasing', label: 'Purchasing', icon: Truck, min: 'manager' },
   { to: '/sales', label: 'Transactions', icon: ReceiptText, min: 'manager' },
   { to: '/reports', label: 'Reports', icon: ChartNoAxesCombined, min: 'manager' },
   { to: '/team', label: 'Team & roles', icon: Users, min: 'admin' },

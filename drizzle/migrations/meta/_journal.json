@@ -36,6 +36,13 @@
       "when": 1791551000000,
       "tag": "0004_settings_and_profile_editing",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791661590366,
+      "tag": "0005_suppliers_purchase_orders",
+      "breakpoints": true
     }
   ]
 }
