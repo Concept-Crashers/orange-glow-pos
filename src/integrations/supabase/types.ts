@@ -77,14 +77,67 @@ export type Database = {
         }
         Relationships: []
       }
+      purchase_orders: {
+        Row: {
+          created_at: string
+          id: string
+          invoice_number: string
+          invoice_total: number
+          items: Json
+          number: string
+          received_at: string | null
+          status: string
+          supplier_id: string | null
+          supplier_name: string
+          total: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invoice_number?: string
+          invoice_total?: number
+          items?: Json
+          number: string
+          received_at?: string | null
+          status?: string
+          supplier_id?: string | null
+          supplier_name?: string
+          total?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invoice_number?: string
+          invoice_total?: number
+          items?: Json
+          number?: string
+          received_at?: string | null
+          status?: string
+          supplier_id?: string | null
+          supplier_name?: string
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_orders_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sales: {
         Row: {
           cashier: string
           created_at: string
+          customer: string | null
           discount: number
           id: string
           items: Json
           payment: string
+          payment_phone: string | null
+          payment_provider: string | null
           refunded: boolean
           subtotal: number
           total: number
@@ -92,10 +145,13 @@ export type Database = {
         Insert: {
           cashier: string
           created_at?: string
+          customer?: string | null
           discount?: number
           id: string
           items?: Json
           payment: string
+          payment_phone?: string | null
+          payment_provider?: string | null
           refunded?: boolean
           subtotal?: number
           total?: number
@@ -103,10 +159,13 @@ export type Database = {
         Update: {
           cashier?: string
           created_at?: string
+          customer?: string | null
           discount?: number
           id?: string
           items?: Json
           payment?: string
+          payment_phone?: string | null
+          payment_provider?: string | null
           refunded?: boolean
           subtotal?: number
           total?: number
@@ -142,6 +201,7 @@ export type Database = {
           address: string
           id: number
           phone: string
+          primary_color: string
           shop_name: string
           updated_at: string
         }
@@ -149,6 +209,7 @@ export type Database = {
           address?: string
           id?: number
           phone?: string
+          primary_color?: string
           shop_name?: string
           updated_at?: string
         }
@@ -156,8 +217,36 @@ export type Database = {
           address?: string
           id?: number
           phone?: string
+          primary_color?: string
           shop_name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      suppliers: {
+        Row: {
+          contact: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string
+        }
+        Insert: {
+          contact?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name: string
+          phone?: string
+        }
+        Update: {
+          contact?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string
         }
         Relationships: []
       }
