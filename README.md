@@ -193,8 +193,8 @@ The application is a TanStack Start and React POS application. Shared POS state 
 Prerequisites: Node.js, npm, a Supabase project, and the required environment variables.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
+git clone https://github.com/Concept-Crashers/orange-glow-pos
+cd orange-glow-pos
 npm install
 npm run dev
 ```
