@@ -37,6 +37,7 @@ export function PosShell({ children }: { children: ReactNode }) {
   const initials = auth.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
   return <div className="app-shell">
     <aside className={`sidebar ${open ? 'sidebar-open' : ''}`}>
+      <button type="button" className="sidebar-close" aria-label="Close navigation" onClick={() => setOpen(false)}><X size={20}/></button>
       <Link to="/register" className="brand"><span className="brand-symbol"><ShoppingBasket size={23}/></span>till<span className="text-primary">point</span><span className="brand-dot">.</span></Link>
       <div className="store-switch"><span className="store-icon"><Store size={19}/></span><div><strong>Fresh Market</strong><span>Main store · Kampala</span></div><ChevronDown size={16}/></div>
       <div className="nav-label">WORKSPACE</div>
