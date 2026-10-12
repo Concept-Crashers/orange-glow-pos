@@ -107,7 +107,7 @@ PDF export is not currently implemented.
 ## Competition Submission
 
 ### 1. Live System URL
-https://pos-khaki-seven.vercel.app/
+https://www.till-point.tech/
 
 ### 2. Test Login Credentials
 
