@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
-import { ShoppingBasket, Boxes, AlertTriangle, RotateCcw, Lightbulb, PackagePlus, ReceiptText, CheckCircle2, Circle, Store, Loader2, Send, ClipboardList, CircleDollarSign, PackageX, ChartNoAxesCombined } from 'lucide-react';
+import { ShoppingBasket, Boxes, AlertTriangle, RotateCcw, Lightbulb, PackagePlus, ReceiptText, CheckCircle2, Circle, Store, Loader2, Send, ClipboardList, CircleDollarSign, PackageX, ChartNoAxesCombined, TrendingUp, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Metric } from '@/components/metric';
 import { usePos, currency } from '@/lib/pos';
 import { useAuth } from '@/lib/auth';
 import { askRestockPlan } from '@/lib/insights.functions';
 import { renderMarkdown } from '@/components/role-views';
+import { SalesTrendChart, PaymentPieChart } from '@/components/charts';
 
 function Heading({ title, subtitle, children }: { title: string; subtitle: string; children?: React.ReactNode }) { return <div className="page-heading"><div><div className="eyebrow">FRESH MARKET WORKSPACE</div><h1>{title}</h1><p>{subtitle}</p></div>{children}</div>; }
 type Task = { label: string; done: boolean; to: '/register' | '/inventory' | '/sales' | '/restock' | '/insights' | '/dashboard' | '/settings' | '/products' | '/shift'; hint: string };
@@ -16,21 +17,51 @@ function Tasks({ items }: { items: Task[] }) {
 }
 const isToday = (d: string) => new Date(d).toLocaleDateString('en-CA') === new Date().toLocaleDateString('en-CA');
 
+function buildDailyData(sales: { date: string; total: number; refunded: boolean }[]) {
+  const now = new Date();
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6 + i);
+    const key = d.toLocaleDateString('en-CA');
+    const day = sales.filter(s => !s.refunded && new Date(s.date).toLocaleDateString('en-CA') === key);
+    return { label: d.toLocaleDateString('en-GB', { weekday: 'short' }), amount: day.reduce((v, s) => v + s.total, 0) };
+  });
+}
+
+function buildPaymentData(sales: { payment: string; total: number; refunded: boolean }[]) {
+  return ['Cash', 'Mobile Money', 'Card', 'Bank transfer']
+    .map(p => ({ name: p, value: sales.filter(s => !s.refunded && s.payment === p).reduce((v, s) => v + s.total, 0) }))
+    .filter(d => d.value > 0);
+}
+
 export function CashierDashboard() {
   const { sales, products } = usePos(); const { name } = useAuth();
   const mine = sales.filter(s => s.cashier === name && isToday(s.date) && !s.refunded);
   const total = mine.reduce((v, s) => v + s.total, 0);
   const low = products.filter(p => p.active && p.stock <= p.min);
+  const myWeek = sales.filter(s => s.cashier === name && !s.refunded);
+  const dailyData = buildDailyData(myWeek);
+  const payData = buildPaymentData(mine);
   const tasks: Task[] = [
     { label: 'Open the till and serve customers', done: mine.length > 0, to: '/register', hint: mine.length ? `${mine.length} sales completed today` : 'Start your first sale of the day' },
-    { label: 'Print a receipt for every sale', done: mine.length > 0, to: '/register', hint: 'Use “Print receipt” after each checkout' },
+    { label: 'Print a receipt for every sale', done: mine.length > 0, to: '/register', hint: 'Use "Print receipt" after each checkout' },
     { label: 'Check shelf stock levels', done: false, to: '/inventory', hint: low.length ? `${low.length} items are running low — tell your manager` : 'All items are well stocked' },
     { label: 'Review your shift before closing', done: false, to: '/shift', hint: 'Count cash and compare with your shift total' },
   ];
-  return <main className="management-page"><Heading title="Cashier dashboard" subtitle="Your cashier dashboard and today’s tasks."><Button asChild><Link to="/register"><ShoppingBasket/>New sale</Link></Button></Heading>
+  return <main className="management-page"><Heading title="Cashier dashboard" subtitle="Your cashier dashboard and today's tasks."><Button asChild><Link to="/register"><ShoppingBasket/>New sale</Link></Button></Heading>
     <div className="metric-grid"><Metric icon={ShoppingBasket} label="My sales today" value={currency(total)}/><Metric icon={ReceiptText} label="Transactions" value={String(mine.length)}/><Metric icon={CircleDollarSign} label="Cash collected" value={currency(mine.filter(s => s.payment === 'Cash').reduce((v, s) => v + s.total, 0))}/><Metric icon={AlertTriangle} label="Low-stock items" value={String(low.length)}/></div>
-    <div className="dashboard-columns"><section><h2 className="section-heading">Today’s tasks</h2><Tasks items={tasks}/></section>
-    <section><h2 className="section-heading">Running low</h2>{low.length ? <div className="table-wrap"><table><thead><tr><th>Product</th><th>In stock</th></tr></thead><tbody>{low.map(p => <tr key={p.id}><td>{p.name}</td><td><span className="stock-tag low">{p.stock} left</span></td></tr>)}</tbody></table></div> : <div className="empty-state"><Boxes/><h3>Shelves look good</h3><p>No items are below their minimum.</p></div>}</section></div>
+    <div className="dashboard-chart-card">
+      <h3 className="chart-card-title"><TrendingUp size={16}/> My weekly sales trend</h3>
+      <SalesTrendChart data={dailyData} />
+    </div>
+    <div className="dashboard-columns">
+      <section><h2 className="section-heading">Today's tasks</h2><Tasks items={tasks}/></section>
+      <section>
+        <h2 className="section-heading">My payment breakdown</h2>
+        <div className="dashboard-chart-card"><PaymentPieChart data={payData} /></div>
+        <h2 className="section-heading">Running low</h2>
+        {low.length ? <div className="table-wrap"><table><thead><tr><th>Product</th><th>In stock</th></tr></thead><tbody>{low.map(p => <tr key={p.id}><td>{p.name}</td><td><span className="stock-tag low">{p.stock} left</span></td></tr>)}</tbody></table></div> : <div className="empty-state"><Boxes/><h3>Shelves look good</h3><p>No items are below their minimum.</p></div>}
+      </section>
+    </div>
   </main>;
 }
 
@@ -41,6 +72,8 @@ export function ManagerDashboard() {
   const low = products.filter(p => p.active && p.stock <= p.min); const out = products.filter(p => p.active && !p.stock);
   const restockedToday = history.some(h => h.change > 0 && isToday(h.date) && !h.reason.startsWith('Refund'));
   const cashiers = [...new Set(done.map(s => s.cashier))].map(c => ({ c, n: done.filter(s => s.cashier === c).length, v: done.filter(s => s.cashier === c).reduce((a, s) => a + s.total, 0) }));
+  const dailyData = buildDailyData(sales);
+  const payData = buildPaymentData(done);
   const tasks: Task[] = [
     { label: 'Restock low items', done: !low.length, to: '/restock', hint: low.length ? `${low.length} items below minimum — get an AI restock plan` : 'Nothing below minimum' },
     { label: 'Record deliveries received', done: restockedToday, to: '/inventory', hint: 'Update quantities when stock arrives' },
@@ -50,9 +83,23 @@ export function ManagerDashboard() {
   ];
   return <main className="management-page"><Heading title="Manager dashboard" subtitle="Today at a glance and what needs your attention."><Button asChild variant="outline"><Link to="/restock"><PackagePlus/>Restock advice</Link></Button></Heading>
     <div className="metric-grid"><Metric icon={ShoppingBasket} label="Sales today" value={currency(total)}/><Metric icon={ReceiptText} label="Transactions" value={String(done.length)}/><Metric icon={RotateCcw} label="Refunds" value={String(refunds.length)}/><Metric icon={PackageX} label="Out of stock" value={String(out.length)} note={`${low.length} low`}/></div>
-    <div className="dashboard-columns"><section><h2 className="section-heading">Your tasks</h2><Tasks items={tasks}/></section>
-    <section><h2 className="section-heading">Cashiers today</h2>{cashiers.length ? <div className="table-wrap"><table><thead><tr><th>Cashier</th><th>Sales</th><th>Amount</th></tr></thead><tbody>{cashiers.map(x => <tr key={x.c}><td>{x.c}</td><td>{x.n}</td><td>{currency(x.v)}</td></tr>)}</tbody></table></div> : <div className="empty-state"><ReceiptText/><h3>No sales yet today</h3><p>Cashier activity will appear here.</p></div>}
-    <h2 className="section-heading">Needs attention</h2><div className="table-wrap"><table><tbody>{low.map(p => <tr key={p.id}><td><AlertTriangle size={14} className="text-warning"/> {p.name}</td><td>{p.stock} / min {p.min}</td></tr>)}{refunds.map(s => <tr key={s.id}><td><RotateCcw size={14}/> Refund {s.id}</td><td>{currency(s.total)}</td></tr>)}</tbody></table>{!low.length && !refunds.length && <div className="empty-state"><h3>All clear</h3></div>}</div></section></div>
+    <div className="dashboard-chart-card">
+      <h3 className="chart-card-title"><TrendingUp size={16}/> Sales — last 7 days</h3>
+      <SalesTrendChart data={dailyData} />
+    </div>
+    <div className="dashboard-columns">
+      <section>
+        <h2 className="section-heading">Your tasks</h2><Tasks items={tasks}/>
+        <h2 className="section-heading">Cashiers today</h2>
+        {cashiers.length ? <div className="table-wrap"><table><thead><tr><th>Cashier</th><th>Sales</th><th>Amount</th></tr></thead><tbody>{cashiers.map(x => <tr key={x.c}><td>{x.c}</td><td>{x.n}</td><td>{currency(x.v)}</td></tr>)}</tbody></table></div> : <div className="empty-state"><ReceiptText/><h3>No sales yet today</h3><p>Cashier activity will appear here.</p></div>}
+      </section>
+      <section>
+        <h2 className="section-heading">Payment breakdown</h2>
+        <div className="dashboard-chart-card"><PaymentPieChart data={payData} /></div>
+        <h2 className="section-heading">Needs attention</h2>
+        <div className="table-wrap"><table><tbody>{low.map(p => <tr key={p.id}><td><AlertTriangle size={14} className="text-warning"/> {p.name}</td><td>{p.stock} / min {p.min}</td></tr>)}{refunds.map(s => <tr key={s.id}><td><RotateCcw size={14}/> Refund {s.id}</td><td>{currency(s.total)}</td></tr>)}</tbody></table>{!low.length && !refunds.length && <div className="empty-state"><h3>All clear</h3></div>}</div>
+      </section>
+    </div>
   </main>;
 }
 

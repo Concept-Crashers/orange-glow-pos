@@ -199,3 +199,43 @@
 .landing-hero-copy > :nth-child(2){animation-delay:.1s}.landing-hero-copy > :nth-child(3){animation-delay:.2s}.landing-hero-copy > :nth-child(4){animation-delay:.3s}.landing-hero-copy > :nth-child(5){animation-delay:.4s}
 .landing-hero-img { animation:rise-in .9s .2s ease both, float-y 6s 1.2s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .page-transition,.metric,.welcome-banner,.landing-hero-copy > *,.landing-hero-img { animation:none !important; } }
+/* Dashboard chart cards */
+.dashboard-chart-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px 22px; margin-bottom:24px; animation:rise-in .4s ease both; }
+.chart-card-title { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; margin-bottom:16px; color:var(--foreground); }
+.chart-card-title svg { color:var(--primary); }
+/* Notification badge + panel */
+.notif-trigger { position:relative; display:flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:8px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer; transition:background .15s,color .15s; }
+.notif-trigger:hover { background:var(--accent); color:var(--foreground); }
+.notif-badge { position:absolute; top:-2px; right:-2px; min-width:17px; height:17px; border-radius:99px; background:var(--destructive); color:#fff; font-size:9px; font-weight:700; display:grid; place-items:center; padding:0 4px; border:2px solid var(--card); }
+.notif-panel { width:420px; max-width:100%; }
+.notif-subtitle { font-size:13px; color:var(--muted-foreground); margin:6px 0 16px !important; }
+.notif-list { display:grid; gap:8px; max-height:340px; overflow:auto; }
+.notif-item { display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border:1px solid var(--border); border-radius:8px; background:var(--card); text-decoration:none; transition:border-color .15s,transform .15s; }
+.notif-item:hover { border-color:var(--primary); transform:translateX(2px); }
+.notif-icon { flex:none; display:grid; place-items:center; width:34px; height:34px; border-radius:7px; }
+.notif-warning .notif-icon { background:var(--warning-soft); color:var(--warning); }
+.notif-error .notif-icon { background:color-mix(in oklab,var(--destructive) 12%,transparent); color:var(--destructive); }
+.notif-info .notif-icon { background:color-mix(in oklab,var(--primary) 12%,transparent); color:var(--primary); }
+.notif-item div { min-width:0; }
+.notif-item strong { display:block; font-size:13px; font-weight:600; color:var(--foreground); }
+.notif-item span { display:block; font-size:11px; color:var(--muted-foreground); margin-top:3px; }
+.notif-empty { text-align:center; padding:30px 0; }
+.notif-empty svg { color:var(--success); margin:0 auto 12px; }
+.notif-empty h3 { font-size:15px; }
+.notif-empty p { font-size:12px; color:var(--muted-foreground); margin-top:6px; }
+.notif-footer { display:flex; justify-content:flex-end; margin-top:18px; }
+/* Landing AI features */
+.landing-ai-features { display:grid; gap:16px; margin-top:28px; }
+.landing-ai-feature { display:flex; gap:12px; align-items:flex-start; }
+.landing-ai-feature svg { flex:none; color:var(--primary); margin-top:2px; }
+.landing-ai-feature strong { display:block; font-size:15px; }
+.landing-ai-feature span { display:block; font-size:13px; color:color-mix(in oklab,var(--card) 65%,transparent); margin-top:3px; line-height:1.5; }
+/* Landing footer */
+.landing-footer { flex-direction:column; gap:16px; align-items:center; text-align:center; }
+.landing-footer-brand { display:flex; flex-direction:column; gap:6px; align-items:center; }
+.landing-footer-brand .brand { font-size:22px; }
+.landing-footer-brand span { font-size:12px; }
+.landing-footer-links { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; }
+.landing-footer-links a { color:var(--muted-foreground); font-size:13px; }
+.landing-footer-links a:hover { color:var(--primary); }
+@media(max-width:640px){ .dashboard-chart-card{padding:16px} .notif-panel{width:100%} .landing-ai-features{gap:12px} }

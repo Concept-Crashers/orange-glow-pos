@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Plus, Pencil, Archive, Download, PackageOpen, RotateCcw, ReceiptText, X } from 'lucide-react';
+import { Plus, Pencil, Archive, Download, PackageOpen, RotateCcw, ReceiptText, X, TrendingUp, CreditCard, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Metric } from '@/components/metric';
 import { usePos, currency, categories, type Product, type Sale } from '@/lib/pos';
 import { Receipt } from '@/components/receipt';
 import { useAuth } from '@/lib/auth';
+import { SalesTrendChart, PaymentPieChart, CategoryBarChart } from '@/components/charts';
+
 function Heading({ title, subtitle, children }: { title: string; subtitle: string; children?: React.ReactNode }) { return <div className="page-heading"><div><div className="eyebrow">FRESH MARKET WORKSPACE</div><h1>{title}</h1><p>{subtitle}</p></div>{children}</div>; }
 function Empty({ title = 'Nothing here yet', description = 'Completed sales will appear here.' }) { return <div className="empty-state"><PackageOpen/><h3>{title}</h3><p>{description}</p></div>; }
 function exportCsv(name: string, rows: (string | number)[][]) { const csv = rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\n'); const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); const a = document.createElement('a'); a.href = url; a.download = `${name}.csv`; a.click(); URL.revokeObjectURL(url); }
@@ -36,8 +38,29 @@ export function DashboardView() {
   const valid = sales.filter(s => !s.refunded && new Date(s.date).getTime() >= new Date(now.getFullYear(), now.getMonth(), now.getDate() - days + 1).getTime());
   const total = valid.reduce((sum, s) => sum + s.total, 0); const profit = valid.reduce((sum, s) => sum + s.total - s.items.reduce((v, i) => v + i.cost * i.quantity, 0), 0);
   const best = products.map(p => ({ ...p, sold: valid.reduce((sum, s) => sum + s.items.filter(i => i.name === p.name).reduce((v, i) => v + i.quantity, 0), 0) })).filter(p => p.sold > 0).sort((a, b) => b.sold - a.sold).slice(0, 5);
-  const daily = Array.from({ length: 7 }, (_, i) => { const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6 + i); const key = d.toLocaleDateString('en-CA'); const day = sales.filter(s => !s.refunded && new Date(s.date).toLocaleDateString('en-CA') === key); return { key, date: d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }), count: day.length, label: d.toLocaleDateString('en-GB', { weekday: 'short' }), amount: day.reduce((v, s) => v + s.total, 0) }; }); const max = Math.max(1, ...daily.map(d => d.amount));
-  return <main className="management-page"><Heading title="Business overview" subtitle="A clear view of how your store is doing."><select aria-label="Dashboard period" className="rounded-md border border-border bg-card px-3 py-2" value={period} onChange={e => setPeriod(e.target.value)}>{['Today', 'This week', 'This month'].map(p => <option key={p}>{p}</option>)}</select></Heading><div className="metric-grid"><Metric label={`${period} · Sales`} value={currency(total)}/><Metric label="Transactions" value={String(valid.length)}/><Metric label="Gross profit" value={currency(profit)}/><Metric label="Active products" value={String(products.filter(p => p.active).length)} note={`${products.filter(p => p.active && p.stock <= p.min).length} products need restocking`}/></div><h2 className="section-heading">Daily totals · last 7 days</h2><div className="dashboard-chart"><div className="chart-bars">{daily.map(d => <div className="chart-column" key={d.label}><small>{currency(d.amount)}</small><div className="bar" data-level={d.amount ? Math.max(1, Math.ceil(d.amount / max * 5)) : 0}/><span>{d.label}</span></div>)}</div></div><div className="table-wrap"><table><thead><tr><th>Day</th><th>Transactions</th><th>Total sales</th></tr></thead><tbody>{daily.slice().reverse().map(d => <tr key={d.key}><td>{d.date}</td><td>{d.count}</td><td>{currency(d.amount)}</td></tr>)}</tbody></table></div><div className="dashboard-columns"><section><h2 className="section-heading">Top-selling products</h2>{best.length ? <div className="table-wrap"><table><thead><tr><th>Product</th><th>Units sold</th><th>Revenue</th></tr></thead><tbody>{best.map(p => <tr key={p.id}><td>{p.name}</td><td>{p.sold}</td><td>{currency(p.sold * p.price)}</td></tr>)}</tbody></table></div> : <Empty title="Your bestsellers are on the way" description="Make your first sale to see what’s popular."/>}</section><section><h2 className="section-heading">Sales by payment method</h2><div className="table-wrap"><table><thead><tr><th>Method</th><th>Sales</th><th>Amount</th><th>Share</th></tr></thead><tbody>{['Cash', 'Mobile Money', 'Card', 'Bank transfer'].map(p => { const g = valid.filter(s => s.payment === p); const amt = g.reduce((v, s) => v + s.total, 0); return <tr key={p}><td>{p}</td><td>{g.length}</td><td>{currency(amt)}</td><td>{total ? Math.round(amt / total * 100) : 0}%</td></tr>; })}</tbody></table></div></section></div></main>;
+  const daily = Array.from({ length: 7 }, (_, i) => { const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6 + i); const key = d.toLocaleDateString('en-CA'); const day = sales.filter(s => !s.refunded && new Date(s.date).toLocaleDateString('en-CA') === key); return { key, date: d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }), count: day.length, label: d.toLocaleDateString('en-GB', { weekday: 'short' }), amount: day.reduce((v, s) => v + s.total, 0) }; });
+  const payData = ['Cash', 'Mobile Money', 'Card', 'Bank transfer'].map(p => ({ name: p, value: valid.filter(s => s.payment === p).reduce((v, s) => v + s.total, 0) })).filter(d => d.value > 0);
+  const catData = categories.slice(1).map(c => ({ category: c, revenue: valid.flatMap(s => s.items).filter(i => { const prod = products.find(p => p.name === i.name); return prod?.category === c; }).reduce((v, i) => v + i.price * i.quantity, 0) })).filter(d => d.revenue > 0);
+  return <main className="management-page"><Heading title="Business overview" subtitle="A clear view of how your store is doing."><select aria-label="Dashboard period" className="rounded-md border border-border bg-card px-3 py-2" value={period} onChange={e => setPeriod(e.target.value)}>{['Today', 'This week', 'This month'].map(p => <option key={p}>{p}</option>)}</select></Heading><div className="metric-grid"><Metric label={`${period} · Sales`} value={currency(total)}/><Metric label="Transactions" value={String(valid.length)}/><Metric label="Gross profit" value={currency(profit)}/><Metric label="Active products" value={String(products.filter(p => p.active).length)} note={`${products.filter(p => p.active && p.stock <= p.min).length} products need restocking`}/></div>
+    <div className="dashboard-chart-card">
+      <h3 className="chart-card-title"><TrendingUp size={16}/> Daily sales — last 7 days</h3>
+      <SalesTrendChart data={daily.map(d => ({ label: d.label, amount: d.amount }))} />
+    </div>
+    <div className="dashboard-columns">
+      <section>
+        <h2 className="section-heading">Revenue by category</h2>
+        <div className="dashboard-chart-card"><CategoryBarChart data={catData} /></div>
+        <h2 className="section-heading">Top-selling products</h2>
+        {best.length ? <div className="table-wrap"><table><thead><tr><th>Product</th><th>Units sold</th><th>Revenue</th></tr></thead><tbody>{best.map(p => <tr key={p.id}><td>{p.name}</td><td>{p.sold}</td><td>{currency(p.sold * p.price)}</td></tr>)}</tbody></table></div> : <Empty title="Your bestsellers are on the way" description="Make your first sale to see what's popular."/>}
+      </section>
+      <section>
+        <h2 className="section-heading">Sales by payment method</h2>
+        <div className="dashboard-chart-card"><PaymentPieChart data={payData} /></div>
+        <h2 className="section-heading">Daily breakdown</h2>
+        <div className="table-wrap"><table><thead><tr><th>Day</th><th>Transactions</th><th>Total sales</th></tr></thead><tbody>{daily.slice().reverse().map(d => <tr key={d.key}><td>{d.date}</td><td>{d.count}</td><td>{currency(d.amount)}</td></tr>)}</tbody></table></div>
+      </section>
+    </div>
+  </main>;
 }
 export function ReportsView() {
   const { sales, products } = usePos(); const [type, setType] = useState('Sales'); const [from, setFrom] = useState(''); const [to, setTo] = useState('');
