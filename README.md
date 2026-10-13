@@ -3,6 +3,14 @@
 
 Tillpoint is a role-based point-of-sale workspace for Fresh Market. It includes checkout, inventory, sales reporting, staff dashboards, restock advice, and store administration.
 
+### Test Login Credentials
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Administrator | `admin@tillpoint.demo` | `Tillpoint#2026` |
+| Manager | `manager@tillpoint.demo` | `Tillpoint#2026` |
+| Cashier | `cashier@tillpoint.demo` | `Tillpoint#2026` |
+
 ## Participant
 
 - **Name:** Wambogo Hassan Sadat
