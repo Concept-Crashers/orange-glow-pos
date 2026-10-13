@@ -4,7 +4,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
-import { ShoppingBasket, LogIn, Zap, Printer, Boxes, Sparkles, ShieldCheck, ChartNoAxesCombined, Users, Check, ArrowRight, Phone, Mail, MapPin, TrendingUp, Wallet, ShoppingCart, BarChart3, Smartphone, Clock, FileText, Package, Bell, Award, Star } from 'lucide-react';
+import { ShoppingBasket, LogIn, Zap, Printer, Boxes, Sparkles, ShieldCheck, ChartNoAxesCombined, Users, Check, ArrowRight, Phone, Mail, MapPin, TrendingUp, Wallet, ShoppingCart, ChartBar as BarChart3, Smartphone, Clock, FileText, Package, Bell, Award, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import hero from '@/assets/landing-hero.jpg';
 
