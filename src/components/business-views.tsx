@@ -42,9 +42,15 @@ export function DashboardView() {
   const payData = ['Cash', 'Mobile Money', 'Card', 'Bank transfer'].map(p => ({ name: p, value: valid.filter(s => s.payment === p).reduce((v, s) => v + s.total, 0) })).filter(d => d.value > 0);
   const catData = categories.slice(1).map(c => ({ category: c, revenue: valid.flatMap(s => s.items).filter(i => { const prod = products.find(p => p.name === i.name); return prod?.category === c; }).reduce((v, i) => v + i.price * i.quantity, 0) })).filter(d => d.revenue > 0);
   return <main className="management-page"><Heading title="Business overview" subtitle="A clear view of how your store is doing."><select aria-label="Dashboard period" className="rounded-md border border-border bg-card px-3 py-2" value={period} onChange={e => setPeriod(e.target.value)}>{['Today', 'This week', 'This month'].map(p => <option key={p}>{p}</option>)}</select></Heading><div className="metric-grid"><Metric label={`${period} · Sales`} value={currency(total)}/><Metric label="Transactions" value={String(valid.length)}/><Metric label="Gross profit" value={currency(profit)}/><Metric label="Active products" value={String(products.filter(p => p.active).length)} note={`${products.filter(p => p.active && p.stock <= p.min).length} products need restocking`}/></div>
-    <div className="dashboard-chart-card">
-      <h3 className="chart-card-title"><TrendingUp size={16}/> Daily sales — last 7 days</h3>
-      <SalesTrendChart data={daily.map(d => ({ label: d.label, amount: d.amount }))} />
+    <div className="chart-row">
+      <div className="dashboard-chart-card">
+        <h3 className="chart-card-title"><TrendingUp size={16}/> Daily sales — last 7 days</h3>
+        <SalesTrendChart data={daily.map(d => ({ label: d.label, amount: d.amount }))} />
+      </div>
+      <div className="dashboard-chart-card">
+        <h3 className="chart-card-title"><CreditCard size={16}/> Sales by payment method</h3>
+        <PaymentPieChart data={payData} />
+      </div>
     </div>
     <div className="dashboard-columns">
       <section>
@@ -54,8 +60,6 @@ export function DashboardView() {
         {best.length ? <div className="table-wrap"><table><thead><tr><th>Product</th><th>Units sold</th><th>Revenue</th></tr></thead><tbody>{best.map(p => <tr key={p.id}><td>{p.name}</td><td>{p.sold}</td><td>{currency(p.sold * p.price)}</td></tr>)}</tbody></table></div> : <Empty title="Your bestsellers are on the way" description="Make your first sale to see what's popular."/>}
       </section>
       <section>
-        <h2 className="section-heading">Sales by payment method</h2>
-        <div className="dashboard-chart-card"><PaymentPieChart data={payData} /></div>
         <h2 className="section-heading">Daily breakdown</h2>
         <div className="table-wrap"><table><thead><tr><th>Day</th><th>Transactions</th><th>Total sales</th></tr></thead><tbody>{daily.slice().reverse().map(d => <tr key={d.key}><td>{d.date}</td><td>{d.count}</td><td>{currency(d.amount)}</td></tr>)}</tbody></table></div>
       </section>

@@ -1,4 +1,6 @@
 import { Link } from '@tanstack/react-router';
+import { useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
 import { ShoppingBasket, LogIn, Zap, Printer, Boxes, Sparkles, ShieldCheck, ChartNoAxesCombined, Users, Check, ArrowRight, Phone, Mail, MapPin, TrendingUp, Wallet, ShoppingCart, BarChart3, Smartphone, Clock, FileText, Package, Bell, Award, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import hero from '@/assets/landing-hero.jpg';
@@ -41,17 +43,32 @@ const stats = [
 ];
 
 export function LandingPage() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      tl.from('.landing-hero-copy > .landing-pill', { y: 20, opacity: 0, duration: 0.6 })
+        .from('.landing-hero-copy > h1', { y: 30, opacity: 0, duration: 0.7 }, '-=0.3')
+        .from('.landing-hero-copy > p', { y: 25, opacity: 0, duration: 0.6 }, '-=0.4')
+        .from('.landing-hero-copy > .landing-cta', { y: 20, opacity: 0, duration: 0.5 }, '-=0.3')
+        .from('.landing-hero-copy > .landing-stats > div', { y: 15, opacity: 0, duration: 0.4, stagger: 0.08 }, '-=0.2');
+      gsap.from(imgRef.current, { x: 60, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.3 });
+      gsap.to(imgRef.current, { y: -12, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1.5 });
+    }, heroRef);
+    return () => ctx.revert();
+  }, []);
   return <div className="landing">
     <header className="landing-nav"><Link to="/" className="brand"><span className="brand-symbol"><ShoppingBasket size={23}/></span>till<span className="text-primary">point</span><span className="brand-dot">.</span></Link>
       <nav>{links.map(([href, label]) => <a key={href} href={href}>{label}</a>)}</nav>
       <Button asChild><Link to="/auth"><LogIn/>Sign in</Link></Button></header>
 
-    <section className="landing-hero"><div className="landing-hero-copy"><span className="landing-pill"><Sparkles size={14}/> Point of sale built for East African retail</span>
+    <section className="landing-hero" ref={heroRef}><div className="landing-hero-copy"><span className="landing-pill"><Sparkles size={14}/> Point of sale built for East African retail</span>
       <h1>Run your store's till, stock and sales from one screen.</h1>
       <p>Tillpoint helps cashiers check out faster, gives managers live stock and sales numbers with visual dashboards, and uses AI to recommend products, explain trends and plan restocks — all in one place.</p>
       <div className="landing-cta"><Button size="lg" asChild><Link to="/auth">Sign in to your store <ArrowRight/></Link></Button><Button size="lg" variant="outline" asChild><a href="#features">Explore features</a></Button></div>
       <div className="landing-stats">{stats.map(s => <div key={s.label}><strong>{s.value}</strong><span>{s.label}</span></div>)}</div></div>
-      <img src={hero} alt="Cashier serving a customer at a Tillpoint checkout" width={1600} height={1008} className="landing-hero-img"/></section>
+      <img src={hero} alt="Cashier serving a customer at a Tillpoint checkout" width={1600} height={1008} className="landing-hero-img" ref={imgRef}/></section>
 
     <section id="features" className="landing-section"><div className="landing-head"><span className="eyebrow">FEATURES</span><h2>Everything a modern counter needs</h2><p>From the first sale to the end-of-day report — Tillpoint covers every part of running your store.</p></div>
       <div className="landing-grid">{features.map(f => <article key={f.title} className="landing-card"><span className="landing-icon"><f.icon size={20}/></span><h3>{f.title}</h3><p>{f.text}</p></article>)}</div></section>

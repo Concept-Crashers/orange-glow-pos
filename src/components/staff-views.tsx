@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
-import { ShoppingBasket, Boxes, AlertTriangle, RotateCcw, Lightbulb, PackagePlus, ReceiptText, CheckCircle2, Circle, Store, Loader2, Send, ClipboardList, CircleDollarSign, PackageX, ChartNoAxesCombined, TrendingUp, Clock } from 'lucide-react';
+import { ShoppingBasket, Boxes, AlertTriangle, RotateCcw, Lightbulb, PackagePlus, ReceiptText, CheckCircle2, Circle, Store, Loader2, Send, ClipboardList, CircleDollarSign, PackageX, ChartNoAxesCombined, TrendingUp, Clock, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Metric } from '@/components/metric';
 import { usePos, currency } from '@/lib/pos';
@@ -49,15 +49,19 @@ export function CashierDashboard() {
   ];
   return <main className="management-page"><Heading title="Cashier dashboard" subtitle="Your cashier dashboard and today's tasks."><Button asChild><Link to="/register"><ShoppingBasket/>New sale</Link></Button></Heading>
     <div className="metric-grid"><Metric icon={ShoppingBasket} label="My sales today" value={currency(total)}/><Metric icon={ReceiptText} label="Transactions" value={String(mine.length)}/><Metric icon={CircleDollarSign} label="Cash collected" value={currency(mine.filter(s => s.payment === 'Cash').reduce((v, s) => v + s.total, 0))}/><Metric icon={AlertTriangle} label="Low-stock items" value={String(low.length)}/></div>
-    <div className="dashboard-chart-card">
-      <h3 className="chart-card-title"><TrendingUp size={16}/> My weekly sales trend</h3>
-      <SalesTrendChart data={dailyData} />
+    <div className="chart-row">
+      <div className="dashboard-chart-card">
+        <h3 className="chart-card-title"><TrendingUp size={16}/> My weekly sales trend</h3>
+        <SalesTrendChart data={dailyData} />
+      </div>
+      <div className="dashboard-chart-card">
+        <h3 className="chart-card-title"><CreditCard size={16}/> My payment breakdown</h3>
+        <PaymentPieChart data={payData} />
+      </div>
     </div>
     <div className="dashboard-columns">
       <section><h2 className="section-heading">Today's tasks</h2><Tasks items={tasks}/></section>
       <section>
-        <h2 className="section-heading">My payment breakdown</h2>
-        <div className="dashboard-chart-card"><PaymentPieChart data={payData} /></div>
         <h2 className="section-heading">Running low</h2>
         {low.length ? <div className="table-wrap"><table><thead><tr><th>Product</th><th>In stock</th></tr></thead><tbody>{low.map(p => <tr key={p.id}><td>{p.name}</td><td><span className="stock-tag low">{p.stock} left</span></td></tr>)}</tbody></table></div> : <div className="empty-state"><Boxes/><h3>Shelves look good</h3><p>No items are below their minimum.</p></div>}
       </section>
@@ -83,9 +87,15 @@ export function ManagerDashboard() {
   ];
   return <main className="management-page"><Heading title="Manager dashboard" subtitle="Today at a glance and what needs your attention."><Button asChild variant="outline"><Link to="/restock"><PackagePlus/>Restock advice</Link></Button></Heading>
     <div className="metric-grid"><Metric icon={ShoppingBasket} label="Sales today" value={currency(total)}/><Metric icon={ReceiptText} label="Transactions" value={String(done.length)}/><Metric icon={RotateCcw} label="Refunds" value={String(refunds.length)}/><Metric icon={PackageX} label="Out of stock" value={String(out.length)} note={`${low.length} low`}/></div>
-    <div className="dashboard-chart-card">
-      <h3 className="chart-card-title"><TrendingUp size={16}/> Sales — last 7 days</h3>
-      <SalesTrendChart data={dailyData} />
+    <div className="chart-row">
+      <div className="dashboard-chart-card">
+        <h3 className="chart-card-title"><TrendingUp size={16}/> Sales — last 7 days</h3>
+        <SalesTrendChart data={dailyData} />
+      </div>
+      <div className="dashboard-chart-card">
+        <h3 className="chart-card-title"><CreditCard size={16}/> Payment breakdown</h3>
+        <PaymentPieChart data={payData} />
+      </div>
     </div>
     <div className="dashboard-columns">
       <section>
@@ -94,8 +104,6 @@ export function ManagerDashboard() {
         {cashiers.length ? <div className="table-wrap"><table><thead><tr><th>Cashier</th><th>Sales</th><th>Amount</th></tr></thead><tbody>{cashiers.map(x => <tr key={x.c}><td>{x.c}</td><td>{x.n}</td><td>{currency(x.v)}</td></tr>)}</tbody></table></div> : <div className="empty-state"><ReceiptText/><h3>No sales yet today</h3><p>Cashier activity will appear here.</p></div>}
       </section>
       <section>
-        <h2 className="section-heading">Payment breakdown</h2>
-        <div className="dashboard-chart-card"><PaymentPieChart data={payData} /></div>
         <h2 className="section-heading">Needs attention</h2>
         <div className="table-wrap"><table><tbody>{low.map(p => <tr key={p.id}><td><AlertTriangle size={14} className="text-warning"/> {p.name}</td><td>{p.stock} / min {p.min}</td></tr>)}{refunds.map(s => <tr key={s.id}><td><RotateCcw size={14}/> Refund {s.id}</td><td>{currency(s.total)}</td></tr>)}</tbody></table>{!low.length && !refunds.length && <div className="empty-state"><h3>All clear</h3></div>}</div>
       </section>
