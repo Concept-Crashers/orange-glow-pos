@@ -23,8 +23,8 @@
 .store-switch div { flex:1; }
 .store-switch div span { font-size:10px; color:var(--muted-foreground); display:block; margin-top:3px; }
 .nav-label { padding:0 12px; font-size:10px; color:var(--muted-foreground); font-weight:600; margin-bottom:14px; letter-spacing:1.4px; }
-.sidebar nav { display:flex; flex-direction:column; gap:7px; flex:1 1 auto; min-height:0; }
-.nav-item { justify-content:flex-start; padding:0 13px; height:46px; gap:12px; color:var(--muted-foreground); font-weight:500; font-size:13px; }
+.sidebar nav { display:flex; flex-direction:column; gap:11px; flex:1 1 auto; min-height:0; }
+.nav-item { justify-content:flex-start; padding:0 13px; height:50px; gap:12px; color:var(--muted-foreground); font-weight:500; font-size:13px; }
 .nav-active { background:var(--secondary); color:var(--primary); font-weight:650; }
 .nav-marker { margin-left:auto; width:6px; height:6px; border-radius:50%; background:var(--primary); }
 .sidebar-bottom { margin-top:auto; padding-top:50px; }

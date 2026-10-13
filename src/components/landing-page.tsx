@@ -1,6 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 import { ShoppingBasket, LogIn, Zap, Printer, Boxes, Sparkles, ShieldCheck, ChartNoAxesCombined, Users, Check, ArrowRight, Phone, Mail, MapPin, TrendingUp, Wallet, ShoppingCart, BarChart3, Smartphone, Clock, FileText, Package, Bell, Award, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import hero from '@/assets/landing-hero.jpg';
@@ -43,6 +46,7 @@ const stats = [
 ];
 
 export function LandingPage() {
+  const rootRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   useEffect(() => {
@@ -55,10 +59,62 @@ export function LandingPage() {
         .from('.landing-hero-copy > .landing-stats > div', { y: 15, opacity: 0, duration: 0.4, stagger: 0.08 }, '-=0.2');
       gsap.from(imgRef.current, { x: 60, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.3 });
       gsap.to(imgRef.current, { y: -12, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1.5 });
-    }, heroRef);
+
+      gsap.utils.toArray<HTMLElement>('.landing-section').forEach(section => {
+        const head = section.querySelector('.landing-head');
+        if (head) {
+          gsap.from(head.children, {
+            y: 30, opacity: 0, duration: 0.6, stagger: 0.12, ease: 'power3.out',
+            scrollTrigger: { trigger: head, start: 'top 85%' },
+          });
+        }
+        const cards = section.querySelectorAll('.landing-grid .landing-card');
+        if (cards.length) {
+          gsap.from(cards, {
+            y: 40, opacity: 0, duration: 0.6, stagger: 0.1, ease: 'power3.out',
+            scrollTrigger: { trigger: section.querySelector('.landing-grid'), start: 'top 85%' },
+          });
+        }
+        const steps = section.querySelectorAll('.landing-steps .landing-step');
+        if (steps.length) {
+          gsap.from(steps, {
+            x: -30, opacity: 0, duration: 0.6, stagger: 0.15, ease: 'power3.out',
+            scrollTrigger: { trigger: section.querySelector('.landing-steps'), start: 'top 85%' },
+          });
+        }
+        const faqItems = section.querySelectorAll('.landing-faq > *');
+        if (faqItems.length) {
+          gsap.from(faqItems, {
+            y: 30, opacity: 0, duration: 0.5, stagger: 0.08, ease: 'power3.out',
+            scrollTrigger: { trigger: section.querySelector('.landing-faq'), start: 'top 85%' },
+          });
+        }
+        const splitSides = section.querySelectorAll('.landing-split > *');
+        if (splitSides.length) {
+          gsap.from(splitSides, {
+            y: 40, opacity: 0, duration: 0.7, stagger: 0.2, ease: 'power3.out',
+            scrollTrigger: { trigger: section, start: 'top 80%' },
+          });
+        }
+        const aiFeatures = section.querySelectorAll('.landing-ai-feature');
+        if (aiFeatures.length) {
+          gsap.from(aiFeatures, {
+            x: -25, opacity: 0, duration: 0.5, stagger: 0.12, ease: 'power3.out',
+            scrollTrigger: { trigger: section.querySelector('.landing-ai-features'), start: 'top 85%' },
+          });
+        }
+        const bubbles = section.querySelectorAll('.landing-bubble');
+        if (bubbles.length) {
+          gsap.from(bubbles, {
+            x: 20, opacity: 0, duration: 0.5, stagger: 0.15, ease: 'power3.out',
+            scrollTrigger: { trigger: section.querySelector('.landing-chat'), start: 'top 85%' },
+          });
+        }
+      });
+    }, rootRef);
     return () => ctx.revert();
   }, []);
-  return <div className="landing">
+  return <div className="landing" ref={rootRef}>
     <header className="landing-nav"><Link to="/" className="brand"><span className="brand-symbol"><ShoppingBasket size={23}/></span>till<span className="text-primary">point</span><span className="brand-dot">.</span></Link>
       <nav>{links.map(([href, label]) => <a key={href} href={href}>{label}</a>)}</nav>
       <Button asChild><Link to="/auth"><LogIn/>Sign in</Link></Button></header>
