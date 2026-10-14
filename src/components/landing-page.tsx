@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
-import { ShoppingBasket, LogIn, Zap, Printer, Boxes, Sparkles, ShieldCheck, ChartNoAxesCombined, Users, Check, ArrowRight, Phone, Mail, MapPin, TrendingUp, Wallet, ShoppingCart, ChartBar as BarChart3, Smartphone, Clock, FileText, Package, Bell, Award, Star } from 'lucide-react';
+import { ShoppingBasket, LogIn, Zap, Printer, Boxes, Sparkles, ShieldCheck, ChartNoAxesCombined, Users, Check, ArrowRight, Phone, Mail, MapPin, TrendingUp, Wallet, ShoppingCart, ChartBar as BarChart3, Smartphone, Clock, FileText, Package, Bell, Award, Star, Globe, Github, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import hero from '@/assets/landing-hero.jpg';
 
@@ -49,6 +49,29 @@ export function LandingPage() {
   const rootRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
+  const [contactStatus, setContactStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+
+  async function submitContact(e: React.FormEvent) {
+    e.preventDefault();
+    if (contactStatus === 'sending') return;
+    setContactStatus('sending');
+    try {
+      const res = await fetch('https://www.till-point.tech/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contactForm),
+      });
+      if (!res.ok) throw new Error('Request failed');
+      setContactStatus('sent');
+      setContactForm({ name: '', email: '', message: '' });
+      setTimeout(() => setContactStatus('idle'), 5000);
+    } catch {
+      setContactStatus('error');
+      setTimeout(() => setContactStatus('idle'), 5000);
+    }
+  }
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
@@ -165,9 +188,17 @@ export function LandingPage() {
     <section id="faq" className="landing-section landing-alt"><div className="landing-head"><span className="eyebrow">FAQ</span><h2>Questions, answered</h2></div>
       <div className="landing-faq">{faqs.map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div></section>
 
-    <section id="contact" className="landing-section"><div className="landing-split"><div><span className="eyebrow">CONTACT</span><h2>Talk to our team</h2><p>We help stores set up registers, receipt printers and staff accounts. Get a free demo or ask anything — we typically respond within one business day.</p></div>
-      <div className="landing-contact"><p><MapPin size={17}/> Plot 12, Kampala Road, Kampala</p><p><Phone size={17}/> +256 786 021431</p><p><Mail size={17}/> hello@tillpoint.ug</p><Button asChild><Link to="/auth"><LogIn/>Staff sign in</Link></Button></div></div></section>
+    <section id="contact" className="landing-section"><div className="landing-head"><span className="eyebrow">CONTACT</span><h2>Talk to our team</h2><p>We help stores set up registers, receipt printers and staff accounts. Get a free demo or ask anything — we typically respond within one business day.</p></div>
+      <div className="contact-layout"><div className="landing-contact"><p><MapPin size={17}/> Plot 12, Kampala Road, Kampala</p><p><Phone size={17}/> +256 786 021431</p><p><Mail size={17}/> wambogohassan63@gmail.com</p><p><Globe size={17}/> www.till-point.tech</p><a href="https://github.com/Chemistry2i" target="_blank" rel="noopener noreferrer" className="contact-social"><Github size={17}/> github.com/Chemistry2i</a><Button asChild><Link to="/auth"><LogIn/>Staff sign in</Link></Button></div>
+        <form className="contact-form" onSubmit={submitContact}><h3>Send us a message</h3>
+          <label>Full name<input required value={contactForm.name} onChange={e => setContactForm({ ...contactForm, name: e.target.value })} placeholder="Your name" /></label>
+          <label>Email<input required type="email" value={contactForm.email} onChange={e => setContactForm({ ...contactForm, email: e.target.value })} placeholder="you@example.com" /></label>
+          <label>Message<textarea required value={contactForm.message} onChange={e => setContactForm({ ...contactForm, message: e.target.value })} placeholder="How can we help your store?" rows={4} /></label>
+          <Button type="submit" disabled={contactStatus === 'sending' || contactStatus === 'sent'}>{contactStatus === 'sending' ? <Loader2 size={16} className="animate-spin"/> : <Send size={16}/>}{contactStatus === 'sending' ? 'Sending…' : contactStatus === 'sent' ? 'Message sent!' : 'Send message'}</Button>
+          {contactStatus === 'sent' && <p className="contact-success">Thank you! We'll get back to you within one business day.</p>}
+          {contactStatus === 'error' && <p className="contact-error">Something went wrong. Please email us directly at wambogohassan63@gmail.com.</p>}
+        </form></div></section>
 
-    <footer className="landing-footer"><div className="landing-footer-brand"><Link to="/" className="brand"><span className="brand-symbol"><ShoppingBasket size={20}/></span>till<span className="text-primary">point</span><span className="brand-dot">.</span></Link><span>The point of sale built for Ugandan retail.</span></div><div className="landing-footer-links"><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#contact">Contact</a><Link to="/auth">Sign in</Link></div><span>© 2026 Tillpoint. All rights reserved. Made for retailers in Uganda.</span></footer>
+    <footer className="landing-footer"><div className="landing-footer-brand"><Link to="/" className="brand"><span className="brand-symbol"><ShoppingBasket size={20}/></span>till<span className="text-primary">point</span><span className="brand-dot">.</span></Link><span>The point of sale built for Ugandan retail.</span></div><div className="landing-footer-links"><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#contact">Contact</a><Link to="/auth">Sign in</Link></div><span>© 2026 Tillpoint · www.till-point.tech · Made for retailers in Uganda.</span></footer>
   </div>;
 }
