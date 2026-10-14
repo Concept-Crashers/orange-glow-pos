@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Search,
   ScanBarcode,
@@ -17,6 +17,8 @@ import {
   Check,
   PackageOpen,
   Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePos, categories, money, currency, type Sale } from "@/lib/pos";
@@ -46,6 +48,7 @@ export function PosRegister() {
   const [customer, setCustomer] = useState("");
   const [customerOpen, setCustomerOpen] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [page, setPage] = useState(0);
   const shown = products.filter(
     (p) =>
       p.active &&
@@ -53,6 +56,14 @@ export function PosRegister() {
       `${p.name} ${p.sku}`.toLowerCase().includes(search.toLowerCase()) &&
       (!stockOnly || p.stock > 0),
   );
+  const PAGE_SIZE = 6;
+  const pageCount = Math.max(1, Math.ceil(shown.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const pageItems = useMemo(
+    () => shown.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE),
+    [shown, safePage],
+  );
+  useEffect(() => { setPage(0); }, [category, search, stockOnly]);
   const lines = cart.flatMap((i) => {
     const product = products.find((p) => p.id === i.id);
     return product ? [{ ...i, product }] : [];
@@ -160,7 +171,7 @@ export function PosRegister() {
           <span>{shown.length} products available</span>
         </div>
         <div className="product-grid">
-          {shown.map((p) => {
+          {pageItems.map((p) => {
             const count = cart.find((i) => i.id === p.id)?.quantity ?? 0;
             return (
               <article className={`product-card ${count ? "product-selected" : ""}`} key={p.id}>
@@ -207,6 +218,13 @@ export function PosRegister() {
             <PackageOpen />
             <h3>No products found</h3>
             <p>Try a different name or category.</p>
+          </div>
+        )}
+        {pageCount > 1 && (
+          <div className="catalog-pagination">
+            <Button variant="ghost" size="icon" disabled={safePage === 0} onClick={() => setPage(safePage - 1)} aria-label="Previous page"><ChevronLeft size={18}/></Button>
+            <span className="page-indicator">Page {safePage + 1} of {pageCount}</span>
+            <Button variant="ghost" size="icon" disabled={safePage >= pageCount - 1} onClick={() => setPage(safePage + 1)} aria-label="Next page"><ChevronRight size={18}/></Button>
           </div>
         )}
         <div className="catalog-bottom">

@@ -60,6 +60,26 @@ export function LandingPage() {
       gsap.from(imgRef.current, { x: 60, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.3 });
       gsap.to(imgRef.current, { y: -12, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1.5 });
 
+      gsap.utils.toArray<HTMLElement>('.landing-stat-item').forEach(stat => {
+        const valueEl = stat.querySelector<HTMLElement>('.landing-stat-value');
+        if (!valueEl) return;
+        const raw = valueEl.dataset.value ?? valueEl.textContent ?? '';
+        const numeric = parseFloat(raw.replace(/[^0-9.]/g, ''));
+        const suffix = raw.replace(/[0-9.]/g, '');
+        const obj = { v: 0 };
+        gsap.to(obj, {
+          v: isNaN(numeric) ? 0 : numeric,
+          duration: 1.4,
+          ease: 'power2.out',
+          delay: 0.3,
+          scrollTrigger: { trigger: stat, start: 'top 90%' },
+          onUpdate: () => {
+            const isInt = numeric % 1 === 0;
+            valueEl.textContent = (isInt ? Math.round(obj.v) : obj.v.toFixed(1)) + suffix;
+          },
+        });
+      });
+
       gsap.utils.toArray<HTMLElement>('.landing-section').forEach(section => {
         const head = section.querySelector('.landing-head');
         if (head) {
@@ -123,7 +143,7 @@ export function LandingPage() {
       <h1>Run your store's till, stock and sales from one screen.</h1>
       <p>Tillpoint helps cashiers check out faster, gives managers live stock and sales numbers with visual dashboards, and uses AI to recommend products, explain trends and plan restocks — all in one place.</p>
       <div className="landing-cta"><Button size="lg" asChild><Link to="/auth">Sign in to your store <ArrowRight/></Link></Button><Button size="lg" variant="outline" asChild><a href="#features">Explore features</a></Button></div>
-      <div className="landing-stats">{stats.map(s => <div key={s.label}><strong>{s.value}</strong><span>{s.label}</span></div>)}</div></div>
+      <div className="landing-stats">{stats.map(s => <div key={s.label} className="landing-stat-item"><s.icon size={20} className="landing-stat-icon"/><strong className="landing-stat-value" data-value={s.value}>{s.value}</strong><span>{s.label}</span></div>)}</div></div>
       <img src={hero} alt="Cashier serving a customer at a Tillpoint checkout" width={1600} height={1008} className="landing-hero-img" ref={imgRef}/></section>
 
     <section id="features" className="landing-section"><div className="landing-head"><span className="eyebrow">FEATURES</span><h2>Everything a modern counter needs</h2><p>From the first sale to the end-of-day report — Tillpoint covers every part of running your store.</p></div>
