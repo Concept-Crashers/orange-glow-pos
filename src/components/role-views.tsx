@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
-import { Lightbulb, Send, ShieldCheck, ShoppingBasket, ReceiptText, ChartNoAxesCombined, CircleDollarSign, Pencil, Save, X } from 'lucide-react';
+import { Lightbulb, Send, ShieldCheck, ShoppingBasket, ReceiptText, ChartNoAxesCombined, CircleDollarSign, Pencil, Save, X, UserPlus, Trash2, Loader2, Users, Mail, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Metric } from '@/components/metric';
 import { supabase } from '@/integrations/supabase/client';
 import { usePos, currency } from '@/lib/pos';
 import { useAuth, roleLabel, type Role } from '@/lib/auth';
 import { askSalesInsights, askProductMatch } from '@/lib/insights.functions';
+import { createStaffMember, removeStaffMember } from '@/lib/team.functions';
 
 function Heading({ title, subtitle }: { title: string; subtitle: string }) { return <div className="page-heading"><div><div className="eyebrow">FRESH MARKET WORKSPACE</div><h1>{title}</h1><p>{subtitle}</p></div></div>; }
 
@@ -61,10 +62,14 @@ export function ShiftView() {
 }
 
 type Member = { id: string; full_name: string; email: string; roles: Role[] };
+const roleRank: Record<Role, number> = { cashier: 1, manager: 2, admin: 3 };
 export function TeamView() {
   const { can, session, refresh } = useAuth(); const isAdmin = can('admin');
-  const [members, setMembers] = useState<Member[]>([]); const [error, setError] = useState('');
+  const createFn = useServerFn(createStaffMember); const removeFn = useServerFn(removeStaffMember);
+  const [members, setMembers] = useState<Member[]>([]); const [error, setError] = useState(''); const [success, setSuccess] = useState('');
   const [editing, setEditing] = useState<string | null>(null); const [draftName, setDraftName] = useState(''); const [draftRole, setDraftRole] = useState<Role>('cashier'); const [saving, setSaving] = useState(false);
+  const [showAdd, setShowAdd] = useState(false); const [newName, setNewName] = useState(''); const [newEmail, setNewEmail] = useState(''); const [newPassword, setNewPassword] = useState(''); const [newRole, setNewRole] = useState<Role>('cashier'); const [adding, setAdding] = useState(false);
+  const [removing, setRemoving] = useState<string | null>(null); const [confirmRemove, setConfirmRemove] = useState<Member | null>(null);
   async function load() {
     const [{ data: p, error: e }, { data: r }] = await Promise.all([supabase.from('profiles').select('id, full_name, email').order('created_at'), supabase.from('user_roles').select('user_id, role')]);
     if (e) { setError(e.message); return; }
@@ -79,19 +84,52 @@ export function TeamView() {
     if (del.error || insErr) setError((del.error ?? insErr)!.message);
     await load(); if (id === session?.user.id) refresh();
   }
-  function beginEdit(member: Member) { setEditing(member.id); setDraftName(member.full_name); setDraftRole(member.roles.includes('admin') ? 'admin' : member.roles.includes('manager') ? 'manager' : 'cashier'); setError(''); }
+  function beginEdit(member: Member) { setEditing(member.id); setDraftName(member.full_name); setDraftRole(member.roles.includes('admin') ? 'admin' : member.roles.includes('manager') ? 'manager' : 'cashier'); setError(''); setSuccess(''); }
   async function saveMember(member: Member) {
-    setSaving(true); setError('');
+    setSaving(true); setError(''); setSuccess('');
     const profile = await supabase.from('profiles').update({ full_name: draftName.trim() }).eq('id', member.id);
     if (profile.error) setError(profile.error.message);
-    else { await setRole(member.id, draftRole); setEditing(null); }
+    else { await setRole(member.id, draftRole); setEditing(null); setSuccess('Staff member updated.'); setTimeout(() => setSuccess(''), 4000); }
     setSaving(false);
   }
-  return <main className="management-page"><Heading title="Team & roles" subtitle={isAdmin ? 'Choose what each staff member can do.' : 'See who works in this store.'}/>
+  async function addMember(e: React.FormEvent) {
+    e.preventDefault(); if (adding) return;
+    setAdding(true); setError(''); setSuccess('');
+    try {
+      const r = await createFn({ data: { email: newEmail.trim(), password: newPassword, fullName: newName.trim(), role: newRole } });
+      if (r.ok) {
+        setSuccess(`${newName.trim()} has been added as ${roleLabel[newRole].toLowerCase()}. They can sign in with their email and password.`);
+        setNewName(''); setNewEmail(''); setNewPassword(''); setNewRole('cashier'); setShowAdd(false);
+        await load();
+        setTimeout(() => setSuccess(''), 6000);
+      } else { setError(r.error); }
+    } catch { setError('Could not create the account. Please try again.'); }
+    setAdding(false);
+  }
+  async function doRemove(member: Member) {
+    setRemoving(member.id); setError('');
+    try {
+      const r = await removeFn({ data: { userId: member.id } });
+      if (r.ok) { setConfirmRemove(null); setSuccess(`${member.full_name || member.email} has been removed.`); await load(); setTimeout(() => setSuccess(''), 4000); }
+      else { setError(r.error); }
+    } catch { setError('Could not remove the account. Please try again.'); }
+    setRemoving(null);
+  }
+  const roleCounts: Record<Role, number> = { admin: 0, manager: 0, cashier: 0 };
+  members.forEach(m => { const r = m.roles.includes('admin') ? 'admin' : m.roles.includes('manager') ? 'manager' : 'cashier'; roleCounts[r]++; });
+  return <main className="management-page"><Heading title="Team & roles" subtitle={isAdmin ? 'Add staff, assign roles, and manage who can access what.' : 'See who works in this store.'}>{isAdmin && <Button onClick={() => { setShowAdd(!showAdd); setError(''); setSuccess(''); }}><UserPlus size={16}/>{showAdd ? 'Cancel' : 'Add staff member'}</Button>}</Heading>
     {error && <p role="alert" className="auth-error">{error}</p>}
-    <div className="team-toolbar"><div><strong>{members.length} staff member{members.length === 1 ? '' : 's'}</strong><span>Manage names and workspace access.</span></div>{isAdmin && <span className="team-admin-badge"><ShieldCheck size={14}/> Administrator controls</span>}</div>
-    <div className="team-list">{members.map(m => { const current: Role = m.roles.includes('admin') ? 'admin' : m.roles.includes('manager') ? 'manager' : 'cashier'; const isEditing = editing === m.id; return <article className="team-member" key={m.id}><div className="team-avatar">{(m.full_name || m.email).slice(0, 1).toUpperCase()}</div><div className="team-member-main">{isEditing ? <input className="team-name-input" aria-label={`Name for ${m.email}`} value={draftName} onChange={e => setDraftName(e.target.value)} /> : <strong>{m.full_name || 'Unnamed staff member'}</strong>}<span>{m.email}</span></div><div className="team-member-role">{isEditing ? <select aria-label={`Role for ${m.email}`} className="role-select" value={draftRole} onChange={e => setDraftRole(e.target.value as Role)}>{(['cashier', 'manager', 'admin'] as Role[]).map(r => <option key={r} value={r}>{roleLabel[r]}</option>)}</select> : <span className={`team-role role-${current}`}><ShieldCheck size={13}/> {roleLabel[current]}</span>}</div>{isAdmin && m.id !== session?.user.id && <div className="team-member-actions">{isEditing ? <><Button size="icon" title="Save staff member" aria-label="Save staff member" disabled={saving} onClick={() => saveMember(m)}><Save size={16}/></Button><Button size="icon" variant="ghost" title="Cancel editing" aria-label="Cancel editing" onClick={() => setEditing(null)}><X size={16}/></Button></> : <Button size="icon" variant="outline" title={`Edit ${m.email}`} aria-label={`Edit ${m.email}`} onClick={() => beginEdit(m)}><Pencil size={16}/></Button>}</div>}</article>; })}</div>
-    <p className="sample-label">Cashiers sell and check stock. Managers also see dashboards, update stock, and use insights. Administrators manage the team.</p>
+    {success && <p className="auth-message">{success}</p>}
+    {isAdmin && showAdd && <form className="team-add-form" onSubmit={addMember}><h3 className="team-add-title"><UserPlus size={18}/> New staff account</h3><p className="team-add-subtitle">The new staff member can sign in immediately with their email and password.</p>
+      <div className="team-add-grid"><label>Full name<input required placeholder="e.g. Sarah Namuli" value={newName} onChange={e => setNewName(e.target.value)} autoComplete="off"/></label><label>Email<input required type="email" placeholder="staff@freshmarket.ug" value={newEmail} onChange={e => setNewEmail(e.target.value)} autoComplete="off"/></label><label>Password<input required type="password" minLength={6} placeholder="At least 6 characters" value={newPassword} onChange={e => setNewPassword(e.target.value)} autoComplete="new-password"/></label><label>Role<select value={newRole} onChange={e => setNewRole(e.target.value as Role)}>{(['cashier', 'manager', 'admin'] as Role[]).map(r => <option key={r} value={r}>{roleLabel[r]}</option>)}</select></label></div>
+      <Button type="submit" disabled={adding}>{adding ? <Loader2 size={16} className="animate-spin"/> : <UserPlus size={16}/>}{adding ? 'Creating…' : 'Create account'}</Button>
+    </form>}
+    <div className="team-stats"><div className="team-stat"><Users size={18}/><div><strong>{members.length}</strong><span>Total staff</span></div></div><div className="team-stat team-stat-admin"><ShieldCheck size={18}/><div><strong>{roleCounts.admin}</strong><span>Administrators</span></div></div><div className="team-stat team-stat-manager"><ChartNoAxesCombined size={18}/><div><strong>{roleCounts.manager}</strong><span>Managers</span></div></div><div className="team-stat team-stat-cashier"><ShoppingBasket size={18}/><div><strong>{roleCounts.cashier}</strong><span>Cashiers</span></div></div></div>
+    <div className="team-toolbar"><div><strong>{members.length} staff member{members.length === 1 ? '' : 's'}</strong><span>{isAdmin ? 'Edit names, change roles, or remove access.' : 'View who works in this store.'}</span></div>{isAdmin && <span className="team-admin-badge"><ShieldCheck size={14}/> Administrator controls</span>}</div>
+    <div className="team-list">{members.length === 0 && <div className="empty-state"><Users/><h3>No staff members yet</h3><p>{isAdmin ? 'Click "Add staff member" to create your first account.' : 'Staff will appear here once added.'}</p></div>}
+    {members.map(m => { const current: Role = m.roles.includes('admin') ? 'admin' : m.roles.includes('manager') ? 'manager' : 'cashier'; const isEditing = editing === m.id; const isSelf = m.id === session?.user.id; return <article className="team-member" key={m.id}><div className="team-avatar">{(m.full_name || m.email).slice(0, 1).toUpperCase()}</div><div className="team-member-main">{isEditing ? <input className="team-name-input" aria-label={`Name for ${m.email}`} value={draftName} onChange={e => setDraftName(e.target.value)} /> : <strong>{m.full_name || 'Unnamed staff member'}{isSelf && <span className="team-self-badge">You</span>}</strong>}<span>{m.email}</span></div><div className="team-member-role">{isEditing ? <select aria-label={`Role for ${m.email}`} className="role-select" value={draftRole} onChange={e => setDraftRole(e.target.value as Role)}>{(['cashier', 'manager', 'admin'] as Role[]).map(r => <option key={r} value={r}>{roleLabel[r]}</option>)}</select> : <span className={`team-role role-${current}`}><ShieldCheck size={13}/> {roleLabel[current]}</span>}</div>{isAdmin && <div className="team-member-actions">{isEditing ? <><Button size="icon" title="Save" aria-label="Save staff member" disabled={saving} onClick={() => saveMember(m)}><Save size={16}/></Button><Button size="icon" variant="ghost" title="Cancel" aria-label="Cancel editing" onClick={() => setEditing(null)}><X size={16}/></Button></> : <><Button size="icon" variant="outline" title={`Edit ${m.email}`} aria-label={`Edit ${m.email}`} disabled={isSelf} onClick={() => beginEdit(m)}><Pencil size={16}/></Button>{!isSelf && <Button size="icon" variant="ghost" title={`Remove ${m.email}`} aria-label={`Remove ${m.email}`} disabled={removing === m.id} onClick={() => setConfirmRemove(m)}>{removing === m.id ? <Loader2 size={16} className="animate-spin"/> : <Trash2 size={16}/>}</Button>}</>}</div>}</article>; })}</div>
+    <p className="sample-label">Cashiers sell and check stock. Managers also manage inventory, refunds, and insights. Administrators control the team and store settings.</p>
+    {confirmRemove && <div className="modal-backdrop" onClick={() => setConfirmRemove(null)}><div className="simple-modal" onClick={e => e.stopPropagation()}><h2>Remove {confirmRemove.full_name || confirmRemove.email}?</h2><p>This will permanently delete their account. They will no longer be able to sign in. This cannot be undone.</p><div className="modal-actions"><Button variant="outline" onClick={() => setConfirmRemove(null)}>Cancel</Button><Button variant="destructive" onClick={() => doRemove(confirmRemove)}><Trash2 size={16}/>Remove permanently</Button></div></div></div>}
   </main>;
 }
 
